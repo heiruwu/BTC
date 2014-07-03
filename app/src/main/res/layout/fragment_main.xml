@@ -20,6 +20,7 @@
 
     <TextView
         android:background="#FF000000"
+        android:scrollbars="vertical"
         android:textColor="#FFFFFFFF"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"

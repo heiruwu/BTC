@@ -12,6 +12,7 @@ import android.support.v4.app.FragmentManager;
 import android.content.Context;
 import android.os.Build;
 import android.os.Bundle;
+import android.text.method.ScrollingMovementMethod;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
@@ -128,6 +129,7 @@ public class MainActivity extends ActionBarActivity
         InputStream mInputStream;
         String selectDevice;
         Thread openConnection;
+        Thread listenData;
         @Override
         public void onCreate(Bundle savedInstanceState) {
             super.onCreate(savedInstanceState);
@@ -145,6 +147,7 @@ public class MainActivity extends ActionBarActivity
             super.onActivityCreated(savedInstanceState);
             btStat = (TextView)getView().findViewById(R.id.btStat);
             rcMessage = (TextView)getView().findViewById(R.id.rcMessage);
+            rcMessage.setMovementMethod(new ScrollingMovementMethod());
             mbtDevices = (ListView)getView().findViewById(R.id.btDevices);
             mbtDevices = (ListView)getView().findViewById(R.id.btDevices);
             if (mBluetoothAdapter == null) {
@@ -220,9 +223,27 @@ public class MainActivity extends ActionBarActivity
                 mInputStream = mBluetoothSocket.getInputStream();
                 rcMessageappend("InputStream initialized\nwaiting for input\n");
             }catch(IOException e){
-                rcMessageappend("Connect error:\nDevices not responding\n");
+                rcMessageappend("Connect error:\nDevice not responding\n");
+                Log.w("exception",e.toString());
             }
 //          beginListenForData();
+            listenData = new Thread(new Runnable() {
+                @Override
+                public void run() {
+                    while(true) {
+                        try {
+                            rcMessageappend("Received message" + String.valueOf(mInputStream.read()) + "\n");
+                        } catch (IOException e) {
+                            Log.w("Received", e.toString());
+                            rcMessageappend("Remote Device's socket closed\n");
+                            break;
+                        }
+                    }
+                }
+            });
+            if(mInputStream != null) {
+                listenData.start();
+            }
         }
         void rcMessageappend(final String str){
             getActivity().runOnUiThread(new Runnable() {
@@ -231,6 +252,7 @@ public class MainActivity extends ActionBarActivity
                     rcMessage.append(str);
                 }
             });
+//            rcMessage.scrollTo(0,rcMessage.getBottom());
         }
 
 
