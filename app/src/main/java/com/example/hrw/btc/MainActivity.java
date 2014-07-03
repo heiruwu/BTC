@@ -127,6 +127,7 @@ public class MainActivity extends ActionBarActivity
         BluetoothSocket mBluetoothSocket;
         InputStream mInputStream;
         String selectDevice;
+        Thread openConnection;
         @Override
         public void onCreate(Bundle savedInstanceState) {
             super.onCreate(savedInstanceState);
@@ -191,7 +192,13 @@ public class MainActivity extends ActionBarActivity
                         for (BluetoothDevice device : pairedDevices){
                             if(device.getName().equals(selectDevice)){
                                 mDevice = device;
-                                openBT();
+                                openConnection = new Thread(new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        openBT();
+                                    }
+                                });
+                                openConnection.start();
                                 break;
                             }
                         }
@@ -201,20 +208,29 @@ public class MainActivity extends ActionBarActivity
             rcMessage.append("Waiting for selection\n");
         }
         void openBT(){
-            rcMessage.append("Connecting......\n");
             UUID uuid = UUID.fromString("00001101-0000-1000-8000-00805F9B34FB"); // Standard
             // SerialPortService
             // ID
+            rcMessageappend("UUID set standard serial port service\n");
             try {
                 mBluetoothSocket = mDevice.createRfcommSocketToServiceRecord(uuid);
+                rcMessageappend("Bluetooth socket initialized\nConnecting......\n");
                 mBluetoothSocket.connect();
-                rcMessage.append("Device connected\n");
+                rcMessageappend("Device connected\n");
                 mInputStream = mBluetoothSocket.getInputStream();
-                rcMessage.append("InputStream initialized\nwaiting for input\n");
+                rcMessageappend("InputStream initialized\nwaiting for input\n");
             }catch(IOException e){
-                rcMessage.append("Connect error:\nDevices not responding\n");
+                rcMessageappend("Connect error:\nDevices not responding\n");
             }
 //          beginListenForData();
+        }
+        void rcMessageappend(final String str){
+            getActivity().runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    rcMessage.append(str);
+                }
+            });
         }
 
 
