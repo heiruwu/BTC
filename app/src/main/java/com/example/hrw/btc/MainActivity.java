@@ -5,32 +5,32 @@ import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothSocket;
 import android.content.Intent;
-import android.support.v7.app.ActionBarActivity;
-import android.support.v7.app.ActionBar;
+import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
-import android.content.Context;
-import android.os.Build;
-import android.os.Bundle;
+import android.support.v4.widget.DrawerLayout;
+import android.support.v7.app.ActionBar;
+import android.support.v7.app.ActionBarActivity;
 import android.text.method.ScrollingMovementMethod;
 import android.util.Log;
-import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.support.v4.widget.DrawerLayout;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
-
+import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.ObjectInputStream;
 import java.util.Set;
 import java.util.UUID;
+import java.util.Scanner;
 
 
 public class MainActivity extends ActionBarActivity
@@ -130,6 +130,7 @@ public class MainActivity extends ActionBarActivity
         String selectDevice;
         Thread openConnection;
         Thread listenData;
+        String tmp;
         @Override
         public void onCreate(Bundle savedInstanceState) {
             super.onCreate(savedInstanceState);
@@ -232,11 +233,12 @@ public class MainActivity extends ActionBarActivity
                 public void run() {
                     while(true) {
                         try {
-                            rcMessageappend("Received message" + String.valueOf(mInputStream.read()) + "\n");
-                        } catch (IOException e) {
-                            Log.w("Received", e.toString());
-                            rcMessageappend("Remote Device's socket closed\n");
-                            break;
+                            if (mInputStream.available() >= 0) {
+//                                new Scanner(mInputStream, "UTF-8").next()
+                                rcMessageappend("Received message: " + getStringByObject(mInputStream) + "\n");
+                            }
+                        }catch (IOException e){
+                            rcMessageappend(e.toString()+"\n");
                         }
                     }
                 }
@@ -245,6 +247,15 @@ public class MainActivity extends ActionBarActivity
                 listenData.start();
             }
         }
+        public String getStringByObject (InputStream inputStream) throws IOException{
+            ObjectInputStream oi = new ObjectInputStream(inputStream);
+            tmp = new String("");
+            for (int i = 0;i <oi.available();i++){
+                tmp += oi.readChar();
+            }
+            return tmp;
+        }
+
         void rcMessageappend(final String str){
             getActivity().runOnUiThread(new Runnable() {
                 @Override
