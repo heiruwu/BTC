@@ -248,12 +248,14 @@ public class MainActivity extends ActionBarActivity
             }
         }
         public String getStringByObject (InputStream inputStream) throws IOException{
-            ObjectInputStream oi = new ObjectInputStream(inputStream);
-            tmp = new String("");
-            for (int i = 0;i <oi.available();i++){
-                tmp += oi.readChar();
-            }
-            return tmp;
+            Scanner s = new Scanner(inputStream).useDelimiter("\\A");
+            return s.hasNext() ? s.next() : "";
+//            ObjectInputStream oi = new ObjectInputStream(inputStream);
+//            tmp = new String("");
+//            while (true){
+//                tmp += oi.readChar();
+//            }
+//            return tmp;
         }
 
         void rcMessageappend(final String str){
