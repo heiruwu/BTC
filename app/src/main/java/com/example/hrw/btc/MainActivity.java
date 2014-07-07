@@ -28,6 +28,9 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+import java.io.OutputStream;
+import java.io.StreamCorruptedException;
 import java.util.Set;
 import java.util.UUID;
 import java.util.Scanner;
@@ -126,11 +129,17 @@ public class MainActivity extends ActionBarActivity
         BluetoothDevice mDevice;
         ListView mbtDevices;
         BluetoothSocket mBluetoothSocket;
+        ObjectOutputStream mObjectOutputStream;
         InputStream mInputStream;
+        OutputStream mOutputStream;
         String selectDevice;
         Thread openConnection;
         Thread listenData;
+        Thread requestData;
         String tmp;
+        int count;
+        int[] data;
+        int GET_HR = 101;
         @Override
         public void onCreate(Bundle savedInstanceState) {
             super.onCreate(savedInstanceState);
@@ -151,6 +160,7 @@ public class MainActivity extends ActionBarActivity
             rcMessage.setMovementMethod(new ScrollingMovementMethod());
             mbtDevices = (ListView)getView().findViewById(R.id.btDevices);
             mbtDevices = (ListView)getView().findViewById(R.id.btDevices);
+            data = new int[]{};
             if (mBluetoothAdapter == null) {
                 Toast.makeText(getActivity(), "not support",
                         Toast.LENGTH_SHORT).show();
@@ -222,33 +232,74 @@ public class MainActivity extends ActionBarActivity
                 mBluetoothSocket.connect();
                 rcMessageappend("Device connected\n");
                 mInputStream = mBluetoothSocket.getInputStream();
+                mOutputStream = mBluetoothSocket.getOutputStream();
                 rcMessageappend("InputStream initialized\nwaiting for input\n");
             }catch(IOException e){
                 rcMessageappend("Connect error:\nDevice not responding\n");
                 Log.w("exception",e.toString());
             }
-            listenData = new Thread(new Runnable() {
-                @Override
-                public void run() {
-                    while(mBluetoothSocket.isConnected()) {
-                        try {
-                            if (mInputStream.available() > 0) {
-                                rcMessageappend("Received message: " + getStringByScanner(mInputStream) + "\n");
-                            }
-                        }catch (IOException e){
-                            rcMessageappend(e.toString()+"\n");
-                        }
-                    }
-                    rcMessageappend("Connection closed\n");
-                }
-            });
-            if(mInputStream != null) {
+            requestData = new Thread(reqData);
+            listenData = new Thread(lisData);
+            if(mInputStream != null && mOutputStream != null) {
                 listenData.start();
+                requestData.start();
             }
         }
+
+        Runnable lisData = new Runnable() {
+            @Override
+            public void run() {
+                while(mBluetoothSocket.isConnected()) {
+                    try {
+                        if (mInputStream.available() > 0) {
+//                            rcMessageappend("Received message: " + getStringByScanner(mInputStream) + "\n"); not used for now
+                            data = getIntArray(mInputStream);
+                            rcMessageappend("Received Data: ");
+                            for (int i = 0;i<count;i++){
+                                rcMessageappend(String.valueOf(data[i])+",");
+                            }
+                            rcMessageappend("\n");
+                            rcMessageappend("Total: "+String.valueOf(count)+"\n");
+                            rcMessageappend("Avg = "+String.valueOf(avg(data))+"\n");
+                        }
+                    }catch (IOException e){
+                        rcMessageappend(e.toString()+"\n");
+                    }catch (ClassNotFoundException e){
+                        rcMessageappend(e.toString()+"\n");
+                    }
+                }
+                rcMessageappend("Connection closed\n");
+            }
+        };
+
+        /**
+         * Request Code GET_HR
+         * for getting data from server
+         */
+        Runnable reqData = new Runnable() {
+            @Override
+            public void run() {
+                while(true) {
+                    try {
+                        count = 60;
+                        mObjectOutputStream = new ObjectOutputStream(mOutputStream);
+                        mObjectOutputStream.writeObject(new int[]{GET_HR,count});
+                        rcMessageappend("Request Code = GET_HR, requesting for data......\n");
+                        Thread.sleep(10000);
+                    } catch (IOException e) {
+                        rcMessageappend("Request:" + e.toString() + "\n");
+                    } catch (InterruptedException e){
+                        rcMessageappend(e.toString());
+                    }
+                }
+            }
+        };
         public String getStringByScanner (InputStream inputStream) throws IOException{
             return new Scanner(inputStream).useDelimiter("\\A").nextLine();
 //            return s.hasNext() ? s.next() : "";
+        }
+        public int[] getIntArray(InputStream inputStream) throws IOException,ClassNotFoundException{
+            return (int[]) new ObjectInputStream(inputStream).readObject();
         }
 
         void rcMessageappend(final String str){
@@ -259,6 +310,14 @@ public class MainActivity extends ActionBarActivity
                 }
             });
 //            rcMessage.scrollTo(0,rcMessage.getBottom());
+        }
+
+        private int avg(int[] a){
+            int temp = 0;
+            for(int i = 0;i<a.length;i++){
+                temp += a[i];
+            }
+            return temp/a.length;
         }
 
 
