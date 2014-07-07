@@ -152,7 +152,7 @@ public class MainActivity extends ActionBarActivity
             mbtDevices = (ListView)getView().findViewById(R.id.btDevices);
             mbtDevices = (ListView)getView().findViewById(R.id.btDevices);
             if (mBluetoothAdapter == null) {
-                Toast.makeText(getActivity(), "not fucking support",
+                Toast.makeText(getActivity(), "not support",
                         Toast.LENGTH_SHORT).show();
             }
             if (!mBluetoothAdapter.enable()) {
@@ -227,35 +227,28 @@ public class MainActivity extends ActionBarActivity
                 rcMessageappend("Connect error:\nDevice not responding\n");
                 Log.w("exception",e.toString());
             }
-//          beginListenForData();
             listenData = new Thread(new Runnable() {
                 @Override
                 public void run() {
-                    while(true) {
+                    while(mBluetoothSocket.isConnected()) {
                         try {
-                            if (mInputStream.available() >= 0) {
-//                                new Scanner(mInputStream, "UTF-8").next()
-                                rcMessageappend("Received message: " + getStringByObject(mInputStream) + "\n");
+                            if (mInputStream.available() > 0) {
+                                rcMessageappend("Received message: " + getStringByScanner(mInputStream) + "\n");
                             }
                         }catch (IOException e){
                             rcMessageappend(e.toString()+"\n");
                         }
                     }
+                    rcMessageappend("Connection closed\n");
                 }
             });
             if(mInputStream != null) {
                 listenData.start();
             }
         }
-        public String getStringByObject (InputStream inputStream) throws IOException{
-            Scanner s = new Scanner(inputStream).useDelimiter("\\A");
-            return s.hasNext() ? s.next() : "";
-//            ObjectInputStream oi = new ObjectInputStream(inputStream);
-//            tmp = new String("");
-//            while (true){
-//                tmp += oi.readChar();
-//            }
-//            return tmp;
+        public String getStringByScanner (InputStream inputStream) throws IOException{
+            return new Scanner(inputStream).useDelimiter("\\A").nextLine();
+//            return s.hasNext() ? s.next() : "";
         }
 
         void rcMessageappend(final String str){
