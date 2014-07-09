@@ -32,7 +32,7 @@ public class BarView extends View {
     private final int BAR_SIDE_MARGIN;
     private final int TEXT_TOP_MARGIN;
     private final int TEXT_COLOR = Color.parseColor("#9B9A9B");
-    private final int BACKGROUND_COLOR = Color.parseColor("#F6F6F6");
+    private final int BACKGROUND_COLOR = Color.parseColor("#33000000");
     private final int FOREGROUND_COLOR = Color.parseColor("#FC496D");
 
     private Runnable animator = new Runnable() {
