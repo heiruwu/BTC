@@ -23,37 +23,61 @@ import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
-import java.io.BufferedReader;
+
+import com.dacer.androidcharts.BarView;
+import com.dacer.androidcharts.LineView;
+
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.OutputStream;
-import java.io.StreamCorruptedException;
+import java.util.ArrayList;
+import java.util.Scanner;
 import java.util.Set;
 import java.util.UUID;
-import java.util.Scanner;
 
+/*
+ * The MIT License (MIT)
 
+ Copyright (c) 2013 Ding Wenhao
+
+ Permission is hereby granted, free of charge, to any person obtaining a copy of
+ this software and associated documentation files (the "Software"), to deal in
+ the Software without restriction, including without limitation the rights to
+ use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of
+ the Software, and to permit persons to whom the Software is furnished to do so,
+ subject to the following conditions:
+
+ The above copyright notice and this permission notice shall be included in all
+ copies or substantial portions of the Software.
+
+ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS
+ FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR
+ COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER
+ IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
+ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+ */
 public class MainActivity extends ActionBarActivity
         implements NavigationDrawerFragment.NavigationDrawerCallbacks {
 
+    public boolean isFirst = true;
     /**
      * Fragment managing the behaviors, interactions and presentation of the navigation drawer.
      */
     private NavigationDrawerFragment mNavigationDrawerFragment;
-
     /**
      * Used to store the last screen title. For use in {@link #restoreActionBar()}.
      */
     private CharSequence mTitle;
+    private ArrayList<Integer> Fdata;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-
+        Fdata = new ArrayList<Integer>();
         mNavigationDrawerFragment = (NavigationDrawerFragment)
                 getSupportFragmentManager().findFragmentById(R.id.navigation_drawer);
         mTitle = getTitle();
@@ -120,64 +144,176 @@ public class MainActivity extends ActionBarActivity
         return super.onOptionsItemSelected(item);
     }
 
+    public ArrayList<Integer> getData() {
+        return this.Fdata;
+    }
+
+    public void setData(int[] tmp) {
+        for (int i = 0; i < tmp.length; i++) {
+            Fdata.add(tmp[i]);
+        }
+    }
+
     /**
      * A placeholder fragment containing a simple view.
      */
     public static class PlaceholderFragment extends Fragment {
-        TextView btStat,rcMessage;
-        BluetoothAdapter mBluetoothAdapter;
-        BluetoothDevice mDevice;
-        ListView mbtDevices;
-        BluetoothSocket mBluetoothSocket;
-        ObjectOutputStream mObjectOutputStream;
-        InputStream mInputStream;
-        OutputStream mOutputStream;
-        String selectDevice;
-        Thread openConnection;
-        Thread listenData;
-        Thread requestData;
-        String tmp;
-        int count;
-        int[] data;
-        int GET_HR = 101;
+        /**
+         * The fragment argument representing the section number for this
+         * fragment.
+         */
+        private static final String ARG_SECTION_NUMBER = "section_number";
+        private static int page = 1;
+        private TextView btStat, rcMessage;
+        private BluetoothAdapter mBluetoothAdapter;
+        private BluetoothDevice mDevice;
+        private ListView mbtDevices;
+        private BluetoothSocket mBluetoothSocket;
+        private ObjectOutputStream mObjectOutputStream;
+        private InputStream mInputStream;
+        private OutputStream mOutputStream;
+        private String selectDevice;
+        private Thread openConnection;
+        private Thread listenData;
+        private Thread requestData;
+        private int count;
+        private int[] data;
+        private int GET_HR = 101;
+        /**
+         * Listening for incoming data
+         * and calculate it's average.
+         */
+        private Runnable lisData = new Runnable() {
+            @Override
+            public void run() {
+                while (mBluetoothSocket.isConnected()) {
+                    try {
+                        if (mInputStream.available() > 0) {
+//                            rcMessageappend("Received message: " + getStringByScanner(mInputStream) + "\n"); not used for now
+                            data = getIntArray(mInputStream);
+                            rcMessageappend("Received Data: ");
+                            for (int i = 0; i < data.length; i++) {
+                                rcMessageappend(String.valueOf(data[i]) + ",");
+                                ((MainActivity) getActivity()).setData(data);
+                            }
+                            ((MainActivity) getActivity()).setData(data);
+                            rcMessageappend("\n");
+                            rcMessageappend("Total: " + String.valueOf(data.length) + "\n");
+                            rcMessageappend("Avg = " + String.valueOf(avg(data)) + "\n");
+                        }
+                    } catch (IOException e) {
+                        rcMessageappend(e.toString() + "\n");
+                    } catch (ClassNotFoundException e) {
+                        rcMessageappend(e.toString() + "\n");
+                    }
+                }
+                rcMessageappend("Connection closed\n");
+            }
+        };
+        /**
+         * Request Code GET_HR
+         * for getting data from server.
+         */
+        private Runnable reqData = new Runnable() {
+            @Override
+            public void run() {
+                count = 100;
+                while (true) {
+                    try {
+                        mObjectOutputStream = new ObjectOutputStream(mOutputStream);
+                        mObjectOutputStream.writeObject(new int[]{GET_HR, count});
+                        rcMessageappend("Request Code = GET_HR, requesting for data......\n");
+                        count++;
+                        Thread.sleep(10000);
+                    } catch (IOException e) {
+                        rcMessageappend("Request:" + e.toString() + "\n");
+                    } catch (InterruptedException e) {
+                        rcMessageappend(e.toString());
+                    }
+                    break;
+                }
+            }
+        };
+
+        public PlaceholderFragment() {
+        }
+
+        /**
+         * Returns a new instance of this fragment for the given section
+         * number.
+         */
+        public static PlaceholderFragment newInstance(int sectionNumber) {
+            PlaceholderFragment fragment = new PlaceholderFragment();
+            page = sectionNumber;
+            Bundle args = new Bundle();
+            args.putInt(ARG_SECTION_NUMBER, sectionNumber);
+            fragment.setArguments(args);
+            return fragment;
+        }
+
         @Override
         public void onCreate(Bundle savedInstanceState) {
             super.onCreate(savedInstanceState);
             mBluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
         }
 
-        /**
-         * The fragment argument representing the section number for this
-         * fragment.
-         */
-        private static final String ARG_SECTION_NUMBER = "section_number";
-
         @Override
         public void onActivityCreated(Bundle savedInstanceState) {
             super.onActivityCreated(savedInstanceState);
-            btStat = (TextView)getView().findViewById(R.id.btStat);
-            rcMessage = (TextView)getView().findViewById(R.id.rcMessage);
-            rcMessage.setMovementMethod(new ScrollingMovementMethod());
-            mbtDevices = (ListView)getView().findViewById(R.id.btDevices);
-            mbtDevices = (ListView)getView().findViewById(R.id.btDevices);
-            data = new int[]{};
-            if (mBluetoothAdapter == null) {
-                Toast.makeText(getActivity(), "not support",
-                        Toast.LENGTH_SHORT).show();
-            }
-            if (!mBluetoothAdapter.enable()) {
-                if (!mBluetoothAdapter.isEnabled()) {
-                    Intent turnOnIntent = new Intent(
-                            BluetoothAdapter.ACTION_REQUEST_ENABLE);
-                    startActivityForResult(turnOnIntent, 0);
-                }
+            switch (page) {
+                case 1:
+                    btStat = (TextView) getView().findViewById(R.id.btStat);
+                    rcMessage = (TextView) getView().findViewById(R.id.rcMessage);
+                    rcMessage.setMovementMethod(new ScrollingMovementMethod());
+                    mbtDevices = (ListView) getView().findViewById(R.id.btDevices);
+                    mbtDevices = (ListView) getView().findViewById(R.id.btDevices);
+                    data = new int[]{};
+                    if (mBluetoothAdapter == null) {
+                        Toast.makeText(getActivity(), "not support",
+                                Toast.LENGTH_SHORT).show();
+                    }
+                    if (!mBluetoothAdapter.enable()) {
+                        if (!mBluetoothAdapter.isEnabled()) {
+                            Intent turnOnIntent = new Intent(
+                                    BluetoothAdapter.ACTION_REQUEST_ENABLE);
+                            startActivityForResult(turnOnIntent, 0);
+                        }
 
+                    }
+                    btStat.setText("Paired Devices");
+                    rcMessage.append("Searching paired device......\n");
+                    findBT();
+                    break;
+                case 2:
+                    TextView avgText = (TextView)getActivity().findViewById(R.id.avgText);
+                    ArrayList<String> bottom = new ArrayList<String>();
+                    bottom.add("1~20");
+                    bottom.add("21~40");
+                    bottom.add("41~60");
+                    bottom.add("61~80");
+                    bottom.add("81~100");
+                    BarView barView = (BarView) getActivity().findViewById(R.id.bar_view);
+                    barView.setBottomTextList(bottom);
+                    ArrayList<Integer> avgData = new ArrayList<Integer>();
+                    int loop = 0;
+                    for(int i = 0;i<5;i++){
+                        int temp1 = 0;
+                        for(int j = 0;j<20;j++){
+                            temp1 += ((MainActivity)getActivity()).getData().get(loop);
+                            loop++;
+                        }
+                        avgData.add(temp1/20);
+                        avgText.append("   "+String.valueOf(temp1/20)+"        ");
+                    }
+                    barView.setDataList(avgData,100);
+                    break;
             }
-            btStat.setText("Paired Devices");
-            rcMessage.append("Searching paired device......\n");
-            findBT();
         }
 
+        /**
+         * List paired device
+         * Set OnItemClickListener to connect
+         */
         void findBT() {
             int mDeviceCount = 0;
             final Set<BluetoothDevice> pairedDevices = mBluetoothAdapter
@@ -189,22 +325,22 @@ public class MainActivity extends ActionBarActivity
                     mDevices[mDeviceCount] = device.getName();
                     mDeviceCount++;
                 }
-                for (int i = 0;i<mDevices.length;i++){
-                    rcMessage.append(mDevices[i]+"\n");
+                for (int i = 0; i < mDevices.length; i++) {
+                    rcMessage.append(mDevices[i] + "\n");
                 }
                 mbtDevices.setAdapter(new ArrayAdapter<String>(
-                    getActivity(),
-                    android.R.layout.simple_list_item_1,
-                    android.R.id.text1,
-                    mDevices
-                    ));
+                        getActivity(),
+                        android.R.layout.simple_list_item_1,
+                        android.R.id.text1,
+                        mDevices
+                ));
                 mbtDevices.setOnItemClickListener(new AdapterView.OnItemClickListener() {
                     @Override
                     public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                         selectDevice = ((TextView) view).getText().toString();
-                        rcMessage.append(selectDevice+" selected\n");
-                        for (BluetoothDevice device : pairedDevices){
-                            if(device.getName().equals(selectDevice)){
+                        rcMessage.append(selectDevice + " selected\n");
+                        for (BluetoothDevice device : pairedDevices) {
+                            if (device.getName().equals(selectDevice)) {
                                 mDevice = device;
                                 openConnection = new Thread(new Runnable() {
                                     @Override
@@ -221,8 +357,15 @@ public class MainActivity extends ActionBarActivity
             }
             rcMessage.append("Waiting for selection\n");
         }
-        void openBT(){
-            UUID uuid = UUID.fromString("00001101-0000-1000-8000-00805F9B34FB"); // Standard
+
+        /**
+         * Open Bluetooth connection
+         * Initialized input and outputstream
+         * Start threads
+         */
+        private void openBT() {
+            UUID uuid = UUID.fromString("00001101-0000-1000-8000-00805F9B34FB");
+            // Standard
             // SerialPortService
             // ID
             rcMessageappend("UUID set standard serial port service\n");
@@ -234,75 +377,32 @@ public class MainActivity extends ActionBarActivity
                 mInputStream = mBluetoothSocket.getInputStream();
                 mOutputStream = mBluetoothSocket.getOutputStream();
                 rcMessageappend("InputStream initialized\nwaiting for input\n");
-            }catch(IOException e){
+                rcMessageappend("OutputStream initialized\nwaiting for Output\n");
+            } catch (IOException e) {
                 rcMessageappend("Connect error:\nDevice not responding\n");
-                Log.w("exception",e.toString());
+                Log.w("exception", e.toString());
             }
             requestData = new Thread(reqData);
             listenData = new Thread(lisData);
-            if(mInputStream != null && mOutputStream != null) {
+            if (mInputStream != null && mOutputStream != null) {
                 listenData.start();
                 requestData.start();
             }
         }
 
-        Runnable lisData = new Runnable() {
-            @Override
-            public void run() {
-                while(mBluetoothSocket.isConnected()) {
-                    try {
-                        if (mInputStream.available() > 0) {
-//                            rcMessageappend("Received message: " + getStringByScanner(mInputStream) + "\n"); not used for now
-                            data = getIntArray(mInputStream);
-                            rcMessageappend("Received Data: ");
-                            for (int i = 0;i<count;i++){
-                                rcMessageappend(String.valueOf(data[i])+",");
-                            }
-                            rcMessageappend("\n");
-                            rcMessageappend("Total: "+String.valueOf(count)+"\n");
-                            rcMessageappend("Avg = "+String.valueOf(avg(data))+"\n");
-                        }
-                    }catch (IOException e){
-                        rcMessageappend(e.toString()+"\n");
-                    }catch (ClassNotFoundException e){
-                        rcMessageappend(e.toString()+"\n");
-                    }
-                }
-                rcMessageappend("Connection closed\n");
-            }
-        };
-
-        /**
-         * Request Code GET_HR
-         * for getting data from server
-         */
-        Runnable reqData = new Runnable() {
-            @Override
-            public void run() {
-                while(true) {
-                    try {
-                        count = 60;
-                        mObjectOutputStream = new ObjectOutputStream(mOutputStream);
-                        mObjectOutputStream.writeObject(new int[]{GET_HR,count});
-                        rcMessageappend("Request Code = GET_HR, requesting for data......\n");
-                        Thread.sleep(10000);
-                    } catch (IOException e) {
-                        rcMessageappend("Request:" + e.toString() + "\n");
-                    } catch (InterruptedException e){
-                        rcMessageappend(e.toString());
-                    }
-                }
-            }
-        };
-        public String getStringByScanner (InputStream inputStream) throws IOException{
+        public String getStringByScanner(InputStream inputStream) throws IOException {
             return new Scanner(inputStream).useDelimiter("\\A").nextLine();
 //            return s.hasNext() ? s.next() : "";
         }
-        public int[] getIntArray(InputStream inputStream) throws IOException,ClassNotFoundException{
+
+        /**
+         * Transfer inputstream to int array.
+         */
+        public int[] getIntArray(InputStream inputStream) throws IOException, ClassNotFoundException {
             return (int[]) new ObjectInputStream(inputStream).readObject();
         }
 
-        void rcMessageappend(final String str){
+        void rcMessageappend(final String str) {
             getActivity().runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
@@ -312,35 +412,29 @@ public class MainActivity extends ActionBarActivity
 //            rcMessage.scrollTo(0,rcMessage.getBottom());
         }
 
-        private int avg(int[] a){
-            int temp = 0;
-            for(int i = 0;i<a.length;i++){
+        private float avg(int[] a) {
+            float temp = 0;
+            for (int i = 0; i < a.length; i++) {
                 temp += a[i];
             }
-            return temp/a.length;
-        }
-
-
-
-        /**
-         * Returns a new instance of this fragment for the given section
-         * number.
-         */
-        public static PlaceholderFragment newInstance(int sectionNumber) {
-            PlaceholderFragment fragment = new PlaceholderFragment();
-            Bundle args = new Bundle();
-            args.putInt(ARG_SECTION_NUMBER, sectionNumber);
-            fragment.setArguments(args);
-            return fragment;
-        }
-
-        public PlaceholderFragment() {
+            return temp / a.length;
         }
 
         @Override
         public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                Bundle savedInstanceState) {
-            View rootView = inflater.inflate(R.layout.fragment_main, container, false);
+                                 Bundle savedInstanceState) {
+            View rootView;
+            switch (page) {
+                case 1:
+                    rootView = inflater.inflate(R.layout.fragment_main, container, false);
+                    break;
+                case 2:
+                    rootView = inflater.inflate(R.layout.fragment_bt_connect, container, false);
+                    break;
+                default:
+                    rootView = null;
+                    break;
+            }
             return rootView;
         }
 
