@@ -9,8 +9,33 @@
     tools:context=".MainActivity$PlaceholderFragment">
 
     <TextView
-        android:id="@+id/section_label"
+        android:id="@+id/btStat"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:textSize="50sp"
+        android:textStyle="italic"
+        android:layout_alignParentTop="true"
+        android:layout_centerHorizontal="true" />
+
+    <TextView
+        android:background="#FF000000"
+        android:scrollbars="vertical"
+        android:textColor="#FFFFFFFF"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:textAppearance="?android:attr/textAppearanceSmall"
+        android:textSize="15sp"
+        android:id="@+id/rcMessage"
+        android:layout_centerHorizontal="true"
+        android:layout_below="@+id/btDevices"
+        android:layout_alignParentBottom="true" />
+
+    <ListView
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content" />
+        android:layout_height="300dp"
+        android:id="@+id/btDevices"
+        android:layout_below="@+id/btStat"
+        android:layout_centerHorizontal="true" />
 
 </RelativeLayout>
