@@ -181,6 +181,9 @@ public class MainActivity extends ActionBarActivity
         private float xd;
         private float xd_av;
         private float xd_sd;
+        private float zd;
+        private float zd_av;
+        private float zd_sd;
         private int count;
         private int[] data;
         private Byte[] packet;
@@ -205,6 +208,15 @@ public class MainActivity extends ActionBarActivity
                                 xd_sd = get71Var(getBitstoString(packet[7]),getBits(packet[7]));
                                 rcMessageappend("SeqID:" + String.valueOf(seqID) + " Payload size:" + String.valueOf(payloadSize)
                                 + " xd:" + String.valueOf(xd) + " xd_av:" + String.valueOf(xd_av) + " xd_sd:" + String.valueOf(xd_sd));
+                                zd = get71Var(getBitstoString(packet[8]),getBits(packet[8]));
+                                zd_av = get71Var(getBitstoString(packet[9]),getBits(packet[9]));
+                                zd_sd = get71Var(getBitstoString(packet[10]),getBits(packet[10]));
+                                rcMessageappend(" zd:" + String.valueOf(zd) + " zd_av:" + String.valueOf(zd_av) + " zd_sd:" + String.valueOf(zd_sd));
+                                rcMessageappend(" stepR:"+ String.valueOf(packet[11] + packet[12]));
+                                rcMessageappend(" stepL:"+ String.valueOf(packet[13] + packet[14]));
+                                rcMessageappend(" lr_ratio:" + String.valueOf(packet[16] + packet[15]));
+                                rcMessageappend(" lr_ratio_avg:" + String.valueOf(packet[18] + packet[17]));
+                                rcMessageappend(" lr_ratio_sd:" + String.valueOf(packet[20] + packet[19]));
                             }
                         }
                     } catch (IOException e) {
@@ -423,6 +435,11 @@ public class MainActivity extends ActionBarActivity
             return (int[]) new ObjectInputStream(inputStream).readObject();
         }
 
+        /**
+         * Transfer a byte to byte array containing all 8 bits.
+         * @param b
+         * @return Byte[]
+         */
         private Byte[] getBits(byte b){
             Byte[] bits = new Byte[8];
             for (int i = 7; i >= 0; i--) {
@@ -432,6 +449,12 @@ public class MainActivity extends ActionBarActivity
             }
             return  bits;
         }
+
+        /**
+         * Transfer a byte to String containing all 8 bits.
+         * @param b
+         * @return String
+         */
         private String getBitstoString(byte b){
             return ""
                     + (byte) ((b >> 7) & 0x1) + (byte) ((b >> 6) & 0x1)
@@ -440,6 +463,12 @@ public class MainActivity extends ActionBarActivity
                     + (byte) ((b >> 1) & 0x1) + (byte) ((b >> 0) & 0x1);
         }
 
+        /**
+         * Get values of 7.1 formatted packet.
+         * @param string input a String containing 8 bit
+         * @param bytes input a Byte array containing 8 bit
+         * @return int
+         */
         private float get71Var(String string, Byte[] bytes){
             float temp;
             if(bytes[0] == 0){
