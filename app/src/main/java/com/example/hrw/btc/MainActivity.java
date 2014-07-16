@@ -33,6 +33,7 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.OutputStream;
 import java.util.ArrayList;
+import java.util.BitSet;
 import java.util.Scanner;
 import java.util.Set;
 import java.util.UUID;
@@ -62,7 +63,6 @@ import java.util.UUID;
 public class MainActivity extends ActionBarActivity
         implements NavigationDrawerFragment.NavigationDrawerCallbacks {
 
-    public boolean isFirst = true;
     /**
      * Fragment managing the behaviors, interactions and presentation of the navigation drawer.
      */
@@ -176,8 +176,14 @@ public class MainActivity extends ActionBarActivity
         private Thread openConnection;
         private Thread listenData;
         private Thread requestData;
+        private Byte seqID;
+        private Byte payloadSize;
+        private float xd;
+        private float xd_av;
+        private float xd_sd;
         private int count;
         private int[] data;
+        private Byte[] packet;
         private int GET_HR = 101;
         /**
          * Listening for incoming data
@@ -189,22 +195,22 @@ public class MainActivity extends ActionBarActivity
                 while (mBluetoothSocket.isConnected()) {
                     try {
                         if (mInputStream.available() > 0) {
-//                            rcMessageappend("Received message: " + getStringByScanner(mInputStream) + "\n"); not used for now
-                            data = getIntArray(mInputStream);
-                            rcMessageappend("Received Data: ");
-                            for (int i = 0; i < data.length; i++) {
-                                rcMessageappend(String.valueOf(data[i]) + ",");
-                                ((MainActivity) getActivity()).setData(data);
+                            getPacketToData(mInputStream);
+                            if(packet[0] == 165 && packet[1] == 165){//if it is the correct packet
+                                rcMessageappend("Packet received:\n");
+                                seqID = packet[3];
+                                payloadSize = packet[4];
+                                xd = get71Var(getBitstoString(packet[5]),getBits(packet[5]));
+                                xd_av = get71Var(getBitstoString(packet[6]),getBits(packet[6]));
+                                xd_sd = get71Var(getBitstoString(packet[7]),getBits(packet[7]));
+                                rcMessageappend("SeqID:" + String.valueOf(seqID) + " Payload size:" + String.valueOf(payloadSize)
+                                + " xd:" + String.valueOf(xd) + " xd_av:" + String.valueOf(xd_av) + " xd_sd:" + String.valueOf(xd_sd));
                             }
-                            ((MainActivity) getActivity()).setData(data);
-                            rcMessageappend("\n");
-                            rcMessageappend("Total: " + String.valueOf(data.length) + "\n");
-                            rcMessageappend("Avg = " + String.valueOf(avg(data)) + "\n");
                         }
                     } catch (IOException e) {
                         rcMessageappend(e.toString() + "\n");
                     } catch (ClassNotFoundException e) {
-                        rcMessageappend(e.toString() + "\n");
+                        e.printStackTrace();
                     }
                 }
                 rcMessageappend("Connection closed\n");
@@ -268,6 +274,7 @@ public class MainActivity extends ActionBarActivity
                     mbtDevices = (ListView) getView().findViewById(R.id.btDevices);
                     mbtDevices = (ListView) getView().findViewById(R.id.btDevices);
                     data = new int[]{};
+                    packet = new Byte[]{};
                     if (mBluetoothAdapter == null) {
                         Toast.makeText(getActivity(), "not support",
                                 Toast.LENGTH_SHORT).show();
@@ -314,7 +321,7 @@ public class MainActivity extends ActionBarActivity
          * List paired device
          * Set OnItemClickListener to connect
          */
-        void findBT() {
+        private void findBT() {
             int mDeviceCount = 0;
             final Set<BluetoothDevice> pairedDevices = mBluetoothAdapter
                     .getBondedDevices();
@@ -382,27 +389,85 @@ public class MainActivity extends ActionBarActivity
                 rcMessageappend("Connect error:\nDevice not responding\n");
                 Log.w("exception", e.toString());
             }
-            requestData = new Thread(reqData);
+//            requestData = new Thread(reqData);
             listenData = new Thread(lisData);
             if (mInputStream != null && mOutputStream != null) {
                 listenData.start();
-                requestData.start();
+//                requestData.start();
             }
         }
 
-        public String getStringByScanner(InputStream inputStream) throws IOException {
+        private String getStringByScanner(InputStream inputStream) throws IOException {
             return new Scanner(inputStream).useDelimiter("\\A").nextLine();
 //            return s.hasNext() ? s.next() : "";
         }
-
+        /**
+         *Get byte array data from input stream.
+         */
+        private void getData() throws IOException, ClassNotFoundException {
+            data = getIntArray(mInputStream);
+            rcMessageappend("Received Data: ");
+            for (int i = 0; i < data.length; i++) {
+                rcMessageappend(String.valueOf(data[i]) + ",");
+                ((MainActivity) getActivity()).setData(data);
+            }
+            ((MainActivity) getActivity()).setData(data);
+            rcMessageappend("\n");
+            rcMessageappend("Total: " + String.valueOf(data.length) + "\n");
+            rcMessageappend("Avg = " + String.valueOf(avg(data)) + "\n");
+        }
         /**
          * Transfer inputstream to int array.
          */
-        public int[] getIntArray(InputStream inputStream) throws IOException, ClassNotFoundException {
+        private int[] getIntArray(InputStream inputStream) throws IOException, ClassNotFoundException {
             return (int[]) new ObjectInputStream(inputStream).readObject();
         }
 
-        void rcMessageappend(final String str) {
+        private Byte[] getBits(byte b){
+            Byte[] bits = new Byte[8];
+            for (int i = 7; i >= 0; i--) {
+                bits[i] = (byte)(b & 1);
+//              packet[5] = (byte) (packet[5] >> 1);
+                b >>= 1;
+            }
+            return  bits;
+        }
+        private String getBitstoString(byte b){
+            return ""
+                    + (byte) ((b >> 7) & 0x1) + (byte) ((b >> 6) & 0x1)
+                    + (byte) ((b >> 5) & 0x1) + (byte) ((b >> 4) & 0x1)
+                    + (byte) ((b >> 3) & 0x1) + (byte) ((b >> 2) & 0x1)
+                    + (byte) ((b >> 1) & 0x1) + (byte) ((b >> 0) & 0x1);
+        }
+
+        private float get71Var(String string, Byte[] bytes){
+            float temp;
+            if(bytes[0] == 0){
+                temp = Integer.parseInt(string.substring(1,7));
+                if (bytes[7] == 0){
+                    return temp;
+                }else{
+                    return  temp + (float) 0.5;
+                }
+            }else{
+                temp = Integer.parseInt(string.substring(1,7)) - 128;
+                if (bytes[7] == 0){
+                    return temp;
+                }else{
+                    return  temp - (float) 0.5;
+                }
+            }
+        }
+
+        private Byte[] getByteArray(InputStream inputStream) throws IOException, ClassNotFoundException {
+            return (Byte[]) new ObjectInputStream(inputStream).readObject();
+        }
+        private Byte[] getPacketToData(InputStream inputStream) throws IOException, ClassNotFoundException {
+            packet = getByteArray(inputStream);
+            return packet;
+        }
+
+        private void rcMessageappend(final String str) {
             getActivity().runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
