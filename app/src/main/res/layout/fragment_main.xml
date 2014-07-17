@@ -33,7 +33,7 @@
 
     <ListView
         android:layout_width="wrap_content"
-        android:layout_height="300dp"
+        android:layout_height="100dp"
         android:id="@+id/btDevices"
         android:layout_below="@+id/btStat"
         android:layout_centerHorizontal="true" />

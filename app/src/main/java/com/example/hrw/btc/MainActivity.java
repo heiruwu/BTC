@@ -186,7 +186,7 @@ public class MainActivity extends ActionBarActivity
         private float zd_sd;
         private int count;
         private int[] data;
-        private Byte[] packet;
+        private byte[] packet;
         private int GET_HR = 101;
         /**
          * Listening for incoming data
@@ -197,32 +197,34 @@ public class MainActivity extends ActionBarActivity
             public void run() {
                 while (mBluetoothSocket.isConnected()) {
                     try {
-                        if (mInputStream.available() > 0) {
-                            getPacketToData(mInputStream);
-                            if(packet[0] == 165 && packet[1] == 165){//if it is the correct packet
+                        if (mInputStream.available() == 23) {
+                            packet = new byte[23];
+                            int useless;
+                            useless = mInputStream.read(packet);
+                            Log.w("Data","available");
+                            Log.w("Header",String.valueOf(packet[0]));
+                            if(packet[0] == -91 && packet[1] == -91){//if it is the correct packet
                                 rcMessageappend("Packet received:\n");
-                                seqID = packet[3];
-                                payloadSize = packet[4];
-                                xd = get71Var(getBitstoString(packet[5]),getBits(packet[5]));
-                                xd_av = get71Var(getBitstoString(packet[6]),getBits(packet[6]));
-                                xd_sd = get71Var(getBitstoString(packet[7]),getBits(packet[7]));
+                                seqID = packet[2];
+                                payloadSize = packet[3];
+                                xd = get71Var(getBitstoString(packet[4]),getBits(packet[4]));
+                                xd_av = get71Var(getBitstoString(packet[5]),getBits(packet[5]));
+                                xd_sd = get71Var(getBitstoString(packet[6]),getBits(packet[6]));
                                 rcMessageappend("SeqID:" + String.valueOf(seqID) + " Payload size:" + String.valueOf(payloadSize)
                                 + " xd:" + String.valueOf(xd) + " xd_av:" + String.valueOf(xd_av) + " xd_sd:" + String.valueOf(xd_sd));
-                                zd = get71Var(getBitstoString(packet[8]),getBits(packet[8]));
-                                zd_av = get71Var(getBitstoString(packet[9]),getBits(packet[9]));
-                                zd_sd = get71Var(getBitstoString(packet[10]),getBits(packet[10]));
+                                zd = get71Var(getBitstoString(packet[7]),getBits(packet[7]));
+                                zd_av = get71Var(getBitstoString(packet[8]),getBits(packet[8]));
+                                zd_sd = get71Var(getBitstoString(packet[9]),getBits(packet[9]));
                                 rcMessageappend(" zd:" + String.valueOf(zd) + " zd_av:" + String.valueOf(zd_av) + " zd_sd:" + String.valueOf(zd_sd));
-                                rcMessageappend(" stepR:"+ String.valueOf(packet[11] + packet[12]));
-                                rcMessageappend(" stepL:"+ String.valueOf(packet[13] + packet[14]));
-                                rcMessageappend(" lr_ratio:" + String.valueOf(packet[16] + packet[15]));
-                                rcMessageappend(" lr_ratio_avg:" + String.valueOf(packet[18] + packet[17]));
-                                rcMessageappend(" lr_ratio_sd:" + String.valueOf(packet[20] + packet[19]));
+                                rcMessageappend(" stepR:"+ String.valueOf(getIntValue(packet[10],packet[11])));
+                                rcMessageappend(" stepL:"+ String.valueOf(getIntValue(packet[12],packet[13])));
+                                rcMessageappend(" lr_ratio:" + String.valueOf(getFloatValue(packet[14],packet[15])));
+                                rcMessageappend(" lr_ratio_avg:" + String.valueOf(getFloatValue(packet[16],packet[17])));
+                                rcMessageappend(" lr_ratio_sd:" + String.valueOf(getFloatValue(packet[18],packet[19])));
                             }
                         }
                     } catch (IOException e) {
                         rcMessageappend(e.toString() + "\n");
-                    } catch (ClassNotFoundException e) {
-                        e.printStackTrace();
                     }
                 }
                 rcMessageappend("Connection closed\n");
@@ -286,7 +288,6 @@ public class MainActivity extends ActionBarActivity
                     mbtDevices = (ListView) getView().findViewById(R.id.btDevices);
                     mbtDevices = (ListView) getView().findViewById(R.id.btDevices);
                     data = new int[]{};
-                    packet = new Byte[]{};
                     if (mBluetoothAdapter == null) {
                         Toast.makeText(getActivity(), "not support",
                                 Toast.LENGTH_SHORT).show();
@@ -396,7 +397,7 @@ public class MainActivity extends ActionBarActivity
                 mInputStream = mBluetoothSocket.getInputStream();
                 mOutputStream = mBluetoothSocket.getOutputStream();
                 rcMessageappend("InputStream initialized\nwaiting for input\n");
-                rcMessageappend("OutputStream initialized\nwaiting for Output\n");
+//                rcMessageappend("OutputStream initialized\nwaiting for Output\n");
             } catch (IOException e) {
                 rcMessageappend("Connect error:\nDevice not responding\n");
                 Log.w("exception", e.toString());
@@ -465,21 +466,23 @@ public class MainActivity extends ActionBarActivity
 
         /**
          * Get values of 7.1 formatted packet.
-         * @param string input a String containing 8 bit
-         * @param bytes input a Byte array containing 8 bit
+         * @param string a String containing 8 bit
+         * @param bytes a Byte array containing 8 bit
          * @return int
          */
         private float get71Var(String string, Byte[] bytes){
             float temp;
             if(bytes[0] == 0){
-                temp = Integer.parseInt(string.substring(1,7));
+                Log.w("Binary String: ", string );
+                temp = Integer.parseInt(string.substring(1,7),2);
+                Log.w("parse",String.valueOf(temp));
                 if (bytes[7] == 0){
                     return temp;
                 }else{
                     return  temp + (float) 0.5;
                 }
             }else{
-                temp = Integer.parseInt(string.substring(1,7)) - 128;
+                temp = Integer.parseInt(string.substring(1,7),2) - 128;
                 if (bytes[7] == 0){
                     return temp;
                 }else{
@@ -488,12 +491,39 @@ public class MainActivity extends ActionBarActivity
             }
         }
 
+        private int getIntValue(Byte L,Byte H){
+            String temp = getBitstoString(H);
+            temp += getBitstoString(L);
+            return Integer.parseInt(temp,2);
+        }
+
+        private float getFloatValue(Byte L,Byte H){
+            float tempint;
+            String temp = getBitstoString(H);
+            temp += getBitstoString(L);
+            tempint = Integer.parseInt(temp.substring(0,14) , 2);
+            if(Integer.valueOf(temp.substring(14,15)) == 0){
+                if(Integer.valueOf(temp.substring(15,16)) == 0){
+                    return tempint;
+                }else{
+                    return tempint + (float)0.24;
+                }
+            }else{
+                if(Integer.valueOf(temp.substring(15,16)) == 0){
+                    return tempint + (float) 0.49;
+                }else{
+                    return tempint + (float) 0.99;
+                }
+            }
+        }
+
         private Byte[] getByteArray(InputStream inputStream) throws IOException, ClassNotFoundException {
-            return (Byte[]) new ObjectInputStream(inputStream).readObject();
+            return (Byte []) new ObjectInputStream(inputStream).readObject();
         }
         private Byte[] getPacketToData(InputStream inputStream) throws IOException, ClassNotFoundException {
-            packet = getByteArray(inputStream);
-            return packet;
+            Byte[] b;
+            b = getByteArray(inputStream);
+            return b;
         }
 
         private void rcMessageappend(final String str) {
