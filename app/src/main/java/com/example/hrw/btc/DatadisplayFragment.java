@@ -42,10 +42,7 @@ limitations under the License.
  * Created by hrw on 2014/7/21.
  */
 public class DatadisplayFragment extends Fragment {
-    private BluetoothAdapter mBluetoothAdapter;
-    private BluetoothDevice mDevice;
     private BluetoothSocket mBluetoothSocket;
-    private ObjectOutputStream mObjectOutputStream;
     private InputStream mInputStream;
     private Thread listenData;
     private Byte seqID;
@@ -68,6 +65,7 @@ public class DatadisplayFragment extends Fragment {
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
+        mBluetoothSocket = ((MainActivity)getActivity()).getBluetoothSocket();
         FlatUI.initDefaultValues(getActivity());
         FlatUI.setDefaultTheme(FlatUI.DEEP);
         mInputStream = ((MainActivity)getActivity()).getInputStream();
@@ -93,7 +91,6 @@ public class DatadisplayFragment extends Fragment {
                         Log.w("Data", "available");
                         Log.w("Header",String.valueOf(packet[0]));
                         if(packet[0] == -91 && packet[1] == -91){//if it is the correct packet
-//                            rcMessageappend("Packet received:\n");
                             seqID = packet[2];
                             payloadSize = packet[3];
                             xd = get71Var(getBitstoString(packet[4]),getBits(packet[4]));

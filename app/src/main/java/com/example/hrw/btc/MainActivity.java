@@ -25,6 +25,7 @@ import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.cengalabs.flatui.FlatUI;
 import com.dacer.androidcharts.BarView;
 import com.dacer.androidcharts.LineView;
 
@@ -74,11 +75,14 @@ public class MainActivity extends ActionBarActivity
     private CharSequence mTitle;
     private ArrayList<Integer> Fdata;
     private InputStream inputStream;
+    private BluetoothSocket bluetoothSocket;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        getActionBar().setBackgroundDrawable(FlatUI.getActionBarDrawable(this,FlatUI.DARK, false));
+        getSupportActionBar().setBackgroundDrawable(FlatUI.getActionBarDrawable(this,FlatUI.DARK, false));
         Fdata = new ArrayList<Integer>();
         mNavigationDrawerFragment = (NavigationDrawerFragment)
                 getSupportFragmentManager().findFragmentById(R.id.navigation_drawer);
@@ -121,6 +125,7 @@ public class MainActivity extends ActionBarActivity
         }
     }
 
+
     public void restoreActionBar() {
         ActionBar actionBar = getSupportActionBar();
         actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_STANDARD);
@@ -128,6 +133,12 @@ public class MainActivity extends ActionBarActivity
         actionBar.setTitle(mTitle);
     }
 
+    public BluetoothSocket getBluetoothSocket(){
+        return this.bluetoothSocket;
+    }
+    public void storeBluetoothSocket(BluetoothSocket bluetoothSocket){
+        this.bluetoothSocket = bluetoothSocket;
+    }
     public void storeInputStream(InputStream inputStream){
         this.inputStream = inputStream;
     }
@@ -363,6 +374,7 @@ public class MainActivity extends ActionBarActivity
                 rcMessageappend("InputStream initialized\nwaiting for input\n");
 //                rcMessageappend("OutputStream initialized\nwaiting for Output\n");
                 ((MainActivity)getActivity()).storeInputStream(mInputStream);
+                ((MainActivity)getActivity()).storeBluetoothSocket(mBluetoothSocket);
             } catch (IOException e) {
                 rcMessageappend("Connect error:\nDevice not responding\n");
                 Log.w("exception", e.toString());
