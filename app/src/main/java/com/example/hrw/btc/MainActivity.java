@@ -8,6 +8,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentTransaction;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarActivity;
@@ -72,6 +73,7 @@ public class MainActivity extends ActionBarActivity
      */
     private CharSequence mTitle;
     private ArrayList<Integer> Fdata;
+    private InputStream inputStream;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -91,10 +93,18 @@ public class MainActivity extends ActionBarActivity
     @Override
     public void onNavigationDrawerItemSelected(int position) {
         // update the main content by replacing fragments
+        Fragment fragment = null;
         FragmentManager fragmentManager = getSupportFragmentManager();
-        fragmentManager.beginTransaction()
-                .replace(R.id.container, PlaceholderFragment.newInstance(position + 1))
-                .commit();
+        switch(position) {
+            case 0:
+                fragmentManager.beginTransaction()
+                    .replace(R.id.container, PlaceholderFragment.newInstance(position + 1))
+                    .commit();
+                break;
+            case 1:
+                fragment = new DatadisplayFragment();
+                fragmentManager.beginTransaction().replace(R.id.container,fragment).commit();
+        }
     }
 
     public void onSectionAttached(int number) {
@@ -118,6 +128,12 @@ public class MainActivity extends ActionBarActivity
         actionBar.setTitle(mTitle);
     }
 
+    public void storeInputStream(InputStream inputStream){
+        this.inputStream = inputStream;
+    }
+    public InputStream getInputStream(){
+        return this.inputStream;
+    }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -174,62 +190,10 @@ public class MainActivity extends ActionBarActivity
         private OutputStream mOutputStream;
         private String selectDevice;
         private Thread openConnection;
-        private Thread listenData;
-        private Thread requestData;
-        private Byte seqID;
-        private Byte payloadSize;
-        private float xd;
-        private float xd_av;
-        private float xd_sd;
-        private float zd;
-        private float zd_av;
-        private float zd_sd;
-        private int count;
         private int[] data;
-        private byte[] packet;
+        private int count;
         private int GET_HR = 101;
-        /**
-         * Listening for incoming data
-         * and calculate it's average.
-         */
-        private Runnable lisData = new Runnable() {
-            @Override
-            public void run() {
-                while (mBluetoothSocket.isConnected()) {
-                    try {
-                        if (mInputStream.available() == 23) {
-                            packet = new byte[23];
-                            int useless;
-                            useless = mInputStream.read(packet);
-                            Log.w("Data","available");
-                            Log.w("Header",String.valueOf(packet[0]));
-                            if(packet[0] == -91 && packet[1] == -91){//if it is the correct packet
-                                rcMessageappend("Packet received:\n");
-                                seqID = packet[2];
-                                payloadSize = packet[3];
-                                xd = get71Var(getBitstoString(packet[4]),getBits(packet[4]));
-                                xd_av = get71Var(getBitstoString(packet[5]),getBits(packet[5]));
-                                xd_sd = get71Var(getBitstoString(packet[6]),getBits(packet[6]));
-                                rcMessageappend("SeqID:" + String.valueOf(seqID) + " Payload size:" + String.valueOf(payloadSize)
-                                + " xd:" + String.valueOf(xd) + " xd_av:" + String.valueOf(xd_av) + " xd_sd:" + String.valueOf(xd_sd));
-                                zd = get71Var(getBitstoString(packet[7]),getBits(packet[7]));
-                                zd_av = get71Var(getBitstoString(packet[8]),getBits(packet[8]));
-                                zd_sd = get71Var(getBitstoString(packet[9]),getBits(packet[9]));
-                                rcMessageappend(" zd:" + String.valueOf(zd) + " zd_av:" + String.valueOf(zd_av) + " zd_sd:" + String.valueOf(zd_sd));
-                                rcMessageappend(" stepR:"+ String.valueOf(getIntValue(packet[10],packet[11])));
-                                rcMessageappend(" stepL:"+ String.valueOf(getIntValue(packet[12],packet[13])));
-                                rcMessageappend(" lr_ratio:" + String.valueOf(getFloatValue(packet[14],packet[15])));
-                                rcMessageappend(" lr_ratio_avg:" + String.valueOf(getFloatValue(packet[16],packet[17])));
-                                rcMessageappend(" lr_ratio_sd:" + String.valueOf(getFloatValue(packet[18],packet[19])));
-                            }
-                        }
-                    } catch (IOException e) {
-                        rcMessageappend(e.toString() + "\n");
-                    }
-                }
-                rcMessageappend("Connection closed\n");
-            }
-        };
+
         /**
          * Request Code GET_HR
          * for getting data from server.
@@ -398,22 +362,24 @@ public class MainActivity extends ActionBarActivity
                 mOutputStream = mBluetoothSocket.getOutputStream();
                 rcMessageappend("InputStream initialized\nwaiting for input\n");
 //                rcMessageappend("OutputStream initialized\nwaiting for Output\n");
+                ((MainActivity)getActivity()).storeInputStream(mInputStream);
             } catch (IOException e) {
                 rcMessageappend("Connect error:\nDevice not responding\n");
                 Log.w("exception", e.toString());
             }
-//            requestData = new Thread(reqData);
-            listenData = new Thread(lisData);
-            if (mInputStream != null && mOutputStream != null) {
-                listenData.start();
-//                requestData.start();
-            }
+
         }
 
-        private String getStringByScanner(InputStream inputStream) throws IOException {
-            return new Scanner(inputStream).useDelimiter("\\A").nextLine();
-//            return s.hasNext() ? s.next() : "";
+        private void rcMessageappend(final String str) {
+            getActivity().runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    rcMessage.append(str);
+                }
+            });
+//            rcMessage.scrollTo(0,rcMessage.getBottom());
         }
+
         /**
          *Get byte array data from input stream.
          */
@@ -429,111 +395,9 @@ public class MainActivity extends ActionBarActivity
             rcMessageappend("Total: " + String.valueOf(data.length) + "\n");
             rcMessageappend("Avg = " + String.valueOf(avg(data)) + "\n");
         }
-        /**
-         * Transfer inputstream to int array.
-         */
+
         private int[] getIntArray(InputStream inputStream) throws IOException, ClassNotFoundException {
             return (int[]) new ObjectInputStream(inputStream).readObject();
-        }
-
-        /**
-         * Transfer a byte to byte array containing all 8 bits.
-         * @param b
-         * @return Byte[]
-         */
-        private Byte[] getBits(byte b){
-            Byte[] bits = new Byte[8];
-            for (int i = 7; i >= 0; i--) {
-                bits[i] = (byte)(b & 1);
-//              packet[5] = (byte) (packet[5] >> 1);
-                b >>= 1;
-            }
-            return  bits;
-        }
-
-        /**
-         * Transfer a byte to String containing all 8 bits.
-         * @param b
-         * @return String
-         */
-        private String getBitstoString(byte b){
-            return ""
-                    + (byte) ((b >> 7) & 0x1) + (byte) ((b >> 6) & 0x1)
-                    + (byte) ((b >> 5) & 0x1) + (byte) ((b >> 4) & 0x1)
-                    + (byte) ((b >> 3) & 0x1) + (byte) ((b >> 2) & 0x1)
-                    + (byte) ((b >> 1) & 0x1) + (byte) ((b >> 0) & 0x1);
-        }
-
-        /**
-         * Get values of 7.1 formatted packet.
-         * @param string a String containing 8 bit
-         * @param bytes a Byte array containing 8 bit
-         * @return int
-         */
-        private float get71Var(String string, Byte[] bytes){
-            float temp;
-            if(bytes[0] == 0){
-                Log.w("Binary String: ", string );
-                temp = Integer.parseInt(string.substring(1,7),2);
-                Log.w("parse",String.valueOf(temp));
-                if (bytes[7] == 0){
-                    return temp;
-                }else{
-                    return  temp + (float) 0.5;
-                }
-            }else{
-                temp = Integer.parseInt(string.substring(1,7),2) - 128;
-                if (bytes[7] == 0){
-                    return temp;
-                }else{
-                    return  temp - (float) 0.5;
-                }
-            }
-        }
-
-        private int getIntValue(Byte L,Byte H){
-            String temp = getBitstoString(H);
-            temp += getBitstoString(L);
-            return Integer.parseInt(temp,2);
-        }
-
-        private float getFloatValue(Byte L,Byte H){
-            float tempint;
-            String temp = getBitstoString(H);
-            temp += getBitstoString(L);
-            tempint = Integer.parseInt(temp.substring(0,14) , 2);
-            if(Integer.valueOf(temp.substring(14,15)) == 0){
-                if(Integer.valueOf(temp.substring(15,16)) == 0){
-                    return tempint;
-                }else{
-                    return tempint + (float)0.24;
-                }
-            }else{
-                if(Integer.valueOf(temp.substring(15,16)) == 0){
-                    return tempint + (float) 0.49;
-                }else{
-                    return tempint + (float) 0.99;
-                }
-            }
-        }
-
-        private Byte[] getByteArray(InputStream inputStream) throws IOException, ClassNotFoundException {
-            return (Byte []) new ObjectInputStream(inputStream).readObject();
-        }
-        private Byte[] getPacketToData(InputStream inputStream) throws IOException, ClassNotFoundException {
-            Byte[] b;
-            b = getByteArray(inputStream);
-            return b;
-        }
-
-        private void rcMessageappend(final String str) {
-            getActivity().runOnUiThread(new Runnable() {
-                @Override
-                public void run() {
-                    rcMessage.append(str);
-                }
-            });
-//            rcMessage.scrollTo(0,rcMessage.getBottom());
         }
 
         private float avg(int[] a) {

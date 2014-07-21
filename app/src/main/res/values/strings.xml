@@ -3,12 +3,25 @@
 
     <string name="app_name">BTC</string>
     <string name="title_section1">Connection page</string>
-    <string name="title_section2">Graphic page</string>
+    <string name="title_section2">Data display page</string>
     <string name="title_section3">Section 3</string>
     <string name="navigation_drawer_open">Open navigation drawer</string>
     <string name="navigation_drawer_close">Close navigation drawer</string>
     <string name="action_example">Example action</string>
     <string name="action_settings">Settings</string>
     <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="xd">Balance Angle</string>
+    <string name="xd_av">xd_av</string>
+    <string name="xd_sd">xd_sd</string>
+    <string name="zd">Inclination Angle</string>
+    <string name="zd_av">zd_av</string>
+    <string name="zd_sd">zd_sd</string>
+    <string name="stepR">Right Step Count</string>
+    <string name="stepL">Left Step Count</string>
+    <string name="lr_ratio">lr_ratio</string>
+    <string name="lr_ratio_av">lr_ratio_av</string>
+    <string name="lr_ratio_sd">lr_ratio_sd</string>
+    <string name="title">Gait Detection</string>
+
 
 </resources>

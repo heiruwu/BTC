@@ -1,0 +1,278 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<LinearLayout
+    android:orientation="vertical"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+    android:background="#FF66CAA6"
+    android:padding="4dp"
+    xmlns:flatui="http://schemas.android.com/apk/res-auto"
+    xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <com.cengalabs.flatui.views.FlatTextView
+        flatui:theme="@array/sand"
+        flatui:textAppearance="light"
+        flatui:fontFamily="roboto"
+        flatui:fontWeight="bold"
+        flatui:fontExtension="ttf"
+        flatui:backgroundColor="main"
+        flatui:cornerRadius="6dp"
+        flatui:textColor="light"
+        android:gravity="center"
+        android:textSize="30sp"
+        android:text="@string/title"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" />
+
+    <LinearLayout
+        xmlns:flatui="http://schemas.android.com/apk/res-auto"
+        android:orientation="horizontal"
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        android:padding="5dp">
+
+        <ImageView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:src="@drawable/feet3232"/>
+        <com.cengalabs.flatui.views.FlatTextView
+            android:layout_marginRight="3dp"
+            flatui:theme="@array/orange"
+            flatui:textAppearance="light"
+            flatui:fontFamily="roboto"
+            flatui:fontWeight="bold"
+            flatui:fontExtension="ttf"
+            flatui:backgroundColor="main"
+            flatui:cornerRadius="3dp"
+            flatui:size="5dp"
+            flatui:textColor="light"
+            android:gravity="center"
+            android:textSize="14sp"
+            android:text="@string/stepR"
+            android:layout_weight="1"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent" />
+        <com.cengalabs.flatui.views.FlatTextView
+            android:id="@+id/stepR"
+            flatui:theme="@array/blood"
+            flatui:textAppearance="light"
+            flatui:fontFamily="roboto"
+            flatui:fontWeight="bold"
+            flatui:fontExtension="ttf"
+            flatui:backgroundColor="main"
+            flatui:cornerRadius="3dp"
+            flatui:size="5dp"
+            flatui:textColor="light"
+            android:gravity="center"
+            android:textSize="12sp"
+            android:layout_weight="1"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent" />
+        <ImageView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:src="@drawable/feet3232"/>
+        <com.cengalabs.flatui.views.FlatTextView
+            android:layout_marginRight="3dp"
+            flatui:theme="@array/orange"
+            flatui:textAppearance="light"
+            flatui:fontFamily="roboto"
+            flatui:fontWeight="bold"
+            flatui:fontExtension="ttf"
+            flatui:backgroundColor="main"
+            flatui:cornerRadius="3dp"
+            flatui:size="5dp"
+            flatui:textColor="light"
+            android:gravity="center"
+            android:textSize="14sp"
+            android:text="@string/stepL"
+            android:layout_weight="1"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent" />
+        <com.cengalabs.flatui.views.FlatTextView
+            android:id="@+id/stepL"
+            flatui:theme="@array/blood"
+            flatui:textAppearance="light"
+            flatui:fontFamily="roboto"
+            flatui:fontWeight="bold"
+            flatui:fontExtension="ttf"
+            flatui:backgroundColor="main"
+            flatui:cornerRadius="3dp"
+            flatui:size="5dp"
+            flatui:textColor="light"
+            android:gravity="center"
+            android:textSize="12sp"
+            android:layout_weight="1"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent" />
+
+    </LinearLayout>
+
+    <LinearLayout
+        xmlns:flatui="http://schemas.android.com/apk/res-auto"
+        android:orientation="horizontal"
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        android:padding="5dp">
+
+        <ImageView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_weight="1.05"
+            android:src="@drawable/angle"/>
+        <com.cengalabs.flatui.views.FlatTextView
+            android:layout_marginRight="3dp"
+            flatui:theme="@array/orange"
+            flatui:textAppearance="light"
+            flatui:fontFamily="roboto"
+            flatui:fontWeight="bold"
+            flatui:fontExtension="ttf"
+            flatui:backgroundColor="main"
+            flatui:cornerRadius="3dp"
+            flatui:size="5dp"
+            flatui:textColor="light"
+            android:gravity="center"
+            android:textSize="12sp"
+            android:text="@string/zd"
+            android:layout_weight="1"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent" />
+        <com.cengalabs.flatui.views.FlatTextView
+            android:id="@+id/zd"
+            android:layout_marginRight="3dp"
+            flatui:theme="@array/blood"
+            flatui:textAppearance="light"
+            flatui:fontFamily="roboto"
+            flatui:fontWeight="bold"
+            flatui:fontExtension="ttf"
+            flatui:backgroundColor="main"
+            flatui:cornerRadius="3dp"
+            flatui:size="5dp"
+            flatui:textColor="light"
+            android:gravity="center"
+            android:textSize="12sp"
+            android:layout_weight="1"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent" />
+
+        <com.cengalabs.flatui.views.FlatTextView
+            android:id="@+id/zd_av"
+            android:layout_marginRight="3dp"
+            flatui:theme="@array/blood"
+            flatui:textAppearance="light"
+            flatui:fontFamily="roboto"
+            flatui:fontWeight="bold"
+            flatui:fontExtension="ttf"
+            flatui:backgroundColor="main"
+            flatui:cornerRadius="3dp"
+            flatui:size="5dp"
+            flatui:textColor="light"
+            android:gravity="center"
+            android:textSize="12sp"
+            android:layout_weight="1"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent" />
+        <com.cengalabs.flatui.views.FlatTextView
+            android:id="@+id/zd_sd"
+            flatui:theme="@array/blood"
+            flatui:textAppearance="light"
+            flatui:fontFamily="roboto"
+            flatui:fontWeight="bold"
+            flatui:fontExtension="ttf"
+            flatui:backgroundColor="main"
+            flatui:cornerRadius="3dp"
+            flatui:size="5dp"
+            flatui:textColor="light"
+            android:gravity="center"
+            android:textSize="12sp"
+            android:layout_weight="1"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent" />
+
+    </LinearLayout>
+
+    <LinearLayout
+        xmlns:flatui="http://schemas.android.com/apk/res-auto"
+        android:orientation="horizontal"
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        android:padding="5dp">
+
+        <ImageView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_weight="1.05"
+            android:src="@drawable/angle"/>
+        <com.cengalabs.flatui.views.FlatTextView
+            android:layout_marginRight="3dp"
+            flatui:theme="@array/orange"
+            flatui:textAppearance="light"
+            flatui:fontFamily="roboto"
+            flatui:fontWeight="bold"
+            flatui:fontExtension="ttf"
+            flatui:backgroundColor="main"
+            flatui:cornerRadius="3dp"
+            flatui:size="5dp"
+            flatui:textColor="light"
+            android:gravity="center"
+            android:textSize="14sp"
+            android:text="@string/xd"
+            android:layout_weight="1"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent" />
+        <com.cengalabs.flatui.views.FlatTextView
+            android:id="@+id/xd"
+            android:layout_marginRight="3dp"
+            flatui:theme="@array/blood"
+            flatui:textAppearance="light"
+            flatui:fontFamily="roboto"
+            flatui:fontWeight="bold"
+            flatui:fontExtension="ttf"
+            flatui:backgroundColor="main"
+            flatui:cornerRadius="3dp"
+            flatui:size="5dp"
+            flatui:textColor="light"
+            android:gravity="center"
+            android:textSize="12sp"
+            android:layout_weight="1"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent" />
+
+        <com.cengalabs.flatui.views.FlatTextView
+            android:id="@+id/xd_av"
+            android:layout_marginRight="3dp"
+            flatui:theme="@array/blood"
+            flatui:textAppearance="light"
+            flatui:fontFamily="roboto"
+            flatui:fontWeight="bold"
+            flatui:fontExtension="ttf"
+            flatui:backgroundColor="main"
+            flatui:cornerRadius="3dp"
+            flatui:size="5dp"
+            flatui:textColor="light"
+            android:gravity="center"
+            android:textSize="12sp"
+            android:layout_weight="1"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent" />
+        <com.cengalabs.flatui.views.FlatTextView
+            android:id="@+id/xd_sd"
+            flatui:theme="@array/blood"
+            flatui:textAppearance="light"
+            flatui:fontFamily="roboto"
+            flatui:fontWeight="bold"
+            flatui:fontExtension="ttf"
+            flatui:backgroundColor="main"
+            flatui:cornerRadius="3dp"
+            flatui:size="5dp"
+            flatui:textColor="light"
+            android:gravity="center"
+            android:textSize="12sp"
+            android:layout_weight="1"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent" />
+
+    </LinearLayout>
+</LinearLayout>
