@@ -18,9 +18,7 @@
     <string name="zd_sd">zd_sd</string>
     <string name="stepR">Right Step Count</string>
     <string name="stepL">Left Step Count</string>
-    <string name="lr_ratio">lr_ratio</string>
-    <string name="lr_ratio_av">lr_ratio_av</string>
-    <string name="lr_ratio_sd">lr_ratio_sd</string>
+    <string name="lr_ratio">Stepping Frequency Ratio</string>
     <string name="title">Gait Detection</string>
 
 

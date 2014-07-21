@@ -45,6 +45,7 @@ public class DatadisplayFragment extends Fragment {
     private BluetoothSocket mBluetoothSocket;
     private InputStream mInputStream;
     private Thread listenData;
+    private TextView stepR,stepL,tvxd,tvxd_av,tvxd_sd,tvzd,tvzd_av,tvzd_sd,lr_ratio,lr_ratio_av,lr_ratio_sd;
     private Byte seqID;
     private Byte payloadSize;
     private float xd;
@@ -65,6 +66,17 @@ public class DatadisplayFragment extends Fragment {
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
+        stepR = (TextView)getView().findViewById(R.id.stepR);
+        stepL = (TextView)getView().findViewById(R.id.stepL);
+        tvxd = (TextView)getView().findViewById(R.id.xd);
+        tvxd_av = (TextView)getView().findViewById(R.id.xd_av);
+        tvxd_sd = (TextView)getView().findViewById(R.id.xd_sd);
+        tvzd = (TextView)getView().findViewById(R.id.zd);
+        tvzd_av = (TextView)getView().findViewById(R.id.zd_av);
+        tvzd_sd = (TextView)getView().findViewById(R.id.zd_sd);
+        lr_ratio = (TextView)getView().findViewById(R.id.lr_ratio);
+        lr_ratio_av = (TextView)getView().findViewById(R.id.lr_ratio_av);
+        lr_ratio_sd = (TextView)getView().findViewById(R.id.lr_ratio_sd);
         mBluetoothSocket = ((MainActivity)getActivity()).getBluetoothSocket();
         FlatUI.initDefaultValues(getActivity());
         FlatUI.setDefaultTheme(FlatUI.DEEP);
@@ -93,20 +105,17 @@ public class DatadisplayFragment extends Fragment {
                         if(packet[0] == -91 && packet[1] == -91){//if it is the correct packet
                             seqID = packet[2];
                             payloadSize = packet[3];
-                            xd = get71Var(getBitstoString(packet[4]),getBits(packet[4]));
-                            xd_av = get71Var(getBitstoString(packet[5]),getBits(packet[5]));
-                            xd_sd = get71Var(getBitstoString(packet[6]),getBits(packet[6]));
-//                            rcMessageappend("SeqID:" + String.valueOf(seqID) + " Payload size:" + String.valueOf(payloadSize)
-//                                    + " xd:" + String.valueOf(xd) + " xd_av:" + String.valueOf(xd_av) + " xd_sd:" + String.valueOf(xd_sd));
-                            zd = get71Var(getBitstoString(packet[7]),getBits(packet[7]));
-                            zd_av = get71Var(getBitstoString(packet[8]),getBits(packet[8]));
-                            zd_sd = get71Var(getBitstoString(packet[9]),getBits(packet[9]));
-//                            rcMessageappend(" zd:" + String.valueOf(zd) + " zd_av:" + String.valueOf(zd_av) + " zd_sd:" + String.valueOf(zd_sd));
-//                            rcMessageappend(" stepR:"+ String.valueOf(getIntValue(packet[10],packet[11])));
-//                            rcMessageappend(" stepL:"+ String.valueOf(getIntValue(packet[12],packet[13])));
-//                            rcMessageappend(" lr_ratio:" + String.valueOf(getFloatValue(packet[14],packet[15])));
-//                            rcMessageappend(" lr_ratio_avg:" + String.valueOf(getFloatValue(packet[16],packet[17])));
-//                            rcMessageappend(" lr_ratio_sd:" + String.valueOf(getFloatValue(packet[18],packet[19])));
+                            tvxd.setText(String.valueOf(get71Var(getBitstoString(packet[4]),getBits(packet[4]))));
+                            tvxd_av.setText(String.valueOf(get71Var(getBitstoString(packet[5]),getBits(packet[5]))));
+                            tvxd_sd.setText(String.valueOf(get71Var(getBitstoString(packet[6]),getBits(packet[6]))));
+                            tvzd.setText(String.valueOf(get71Var(getBitstoString(packet[7]),getBits(packet[7]))));
+                            tvzd_av.setText(String.valueOf(get71Var(getBitstoString(packet[8]),getBits(packet[8]))));
+                            tvzd_sd.setText(String.valueOf(get71Var(getBitstoString(packet[9]),getBits(packet[9]))));
+                            stepR.setText(String.valueOf(getIntValue(packet[10],packet[11])));
+                            stepL.setText(String.valueOf(getIntValue(packet[12],packet[13])));
+                            lr_ratio.setText(String.valueOf(getFloatValue(packet[14],packet[15])));
+                            lr_ratio_av.setText(String.valueOf(getFloatValue(packet[16],packet[17])));
+                            lr_ratio_sd.setText(String.valueOf(getFloatValue(packet[18],packet[19])));
                         }
                     }
                 } catch (IOException e) {
