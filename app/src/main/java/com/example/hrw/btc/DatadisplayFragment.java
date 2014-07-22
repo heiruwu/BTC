@@ -10,6 +10,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.Window;
 import android.widget.ListView;
 import android.widget.TextView;
 
@@ -46,17 +47,8 @@ public class DatadisplayFragment extends Fragment {
     private InputStream mInputStream;
     private Thread listenData;
     private TextView stepR,stepL,tvxd,tvxd_av,tvxd_sd,tvzd,tvzd_av,tvzd_sd,lr_ratio,lr_ratio_av,lr_ratio_sd;
-    private Byte seqID;
-    private Byte payloadSize;
-    private float xd;
-    private float xd_av;
-    private float xd_sd;
-    private float zd;
-    private float zd_av;
-    private float zd_sd;
-    private int count;
     private byte[] packet;
-    private int GET_HR = 101;
+
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -103,17 +95,17 @@ public class DatadisplayFragment extends Fragment {
                         Log.w("Data", "available");
                         Log.w("Header",String.valueOf(packet[0]));
                         if(packet[0] == -91 && packet[1] == -91){//if it is the correct packet
-                            seqID = packet[2];
-                            payloadSize = packet[3];
+//                            seqID = packet[2];
+//                            payloadSize = packet[3];
                             tvxd.setText(String.valueOf(get71Var(getBitstoString(packet[4]),getBits(packet[4]))));
                             tvxd_av.setText(String.valueOf(get71Var(getBitstoString(packet[5]),getBits(packet[5]))));
                             tvxd_sd.setText(String.valueOf(get71Var(getBitstoString(packet[6]),getBits(packet[6]))));
                             tvzd.setText(String.valueOf(get71Var(getBitstoString(packet[7]),getBits(packet[7]))));
-                            tvzd_av.setText(String.valueOf(get71Var(getBitstoString(packet[8]),getBits(packet[8]))));
+                            tvzd_av.setText(String.valueOf(get71Var(getBitstoString(packet[8]), getBits(packet[8]))));
                             tvzd_sd.setText(String.valueOf(get71Var(getBitstoString(packet[9]),getBits(packet[9]))));
-                            stepR.setText(String.valueOf(getIntValue(packet[10],packet[11])));
-                            stepL.setText(String.valueOf(getIntValue(packet[12],packet[13])));
-                            lr_ratio.setText(String.valueOf(getFloatValue(packet[14],packet[15])));
+                            stepR.setText(String.valueOf(getIntValue(packet[10], packet[11])));
+                            stepL.setText(String.valueOf(getIntValue(packet[12], packet[13])));
+                            lr_ratio.setText(String.valueOf(getFloatValue(packet[14], packet[15])));
                             lr_ratio_av.setText(String.valueOf(getFloatValue(packet[16],packet[17])));
                             lr_ratio_sd.setText(String.valueOf(getFloatValue(packet[18],packet[19])));
                         }
