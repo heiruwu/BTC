@@ -13,6 +13,7 @@ import android.view.ViewGroup;
 import android.view.Window;
 import android.widget.ListView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.cengalabs.flatui.FlatUI;
 
@@ -94,7 +95,7 @@ public class DatadisplayFragment extends Fragment {
                         useless = mInputStream.read(packet);
                         Log.w("Data", "available");
                         Log.w("Header",String.valueOf(packet[0]));
-                        if(packet[0] == -91 && packet[1] == -91){//if it is the correct packet
+                        if(packet[0] == -91 && packet[1] == -91){//if it is the correct packetf
 //                            seqID = packet[2];
 //                            payloadSize = packet[3];
                             getActivity().runOnUiThread(new Runnable() {
@@ -116,10 +117,15 @@ public class DatadisplayFragment extends Fragment {
                         }
                     }
                 } catch (IOException e) {
-//                    rcMessageappend(e.toString() + "\n");
+                    Log.w("DatadisplayFragment","mInputStream error: "+e.toString());
                 }
             }
-//            rcMessageappend("Connection closed\n");
+            getActivity().runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    Toast.makeText(getActivity(),"Connection corrupted",Toast.LENGTH_SHORT).show();
+                }
+            });
         }
     };
 
