@@ -1,10 +1,12 @@
 package com.example.hrw.btc;
 
+import android.annotation.TargetApi;
 import android.app.Activity;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothSocket;
 import android.content.Intent;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
@@ -30,11 +32,14 @@ import com.cengalabs.flatui.FlatUI;
 import com.dacer.androidcharts.BarView;
 import com.dacer.androidcharts.LineView;
 
+import java.io.IOError;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.OutputStream;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.BitSet;
 import java.util.Scanner;
@@ -107,8 +112,12 @@ public class MainActivity extends ActionBarActivity
                     .commit();
                 break;
             case 1:
-                fragment = new DatadisplayFragment();
-                fragmentManager.beginTransaction().replace(R.id.container,fragment).commit();
+                if(bluetoothSocket.isConnected()) {
+                    fragment = new DatadisplayFragment();
+                    fragmentManager.beginTransaction().replace(R.id.container, fragment).commit();
+                }else{
+                    Toast.makeText(this,"Please connect to the device first",Toast.LENGTH_LONG).show();
+                }
         }
     }
 
@@ -341,7 +350,15 @@ public class MainActivity extends ActionBarActivity
                                 openConnection = new Thread(new Runnable() {
                                     @Override
                                     public void run() {
-                                        openBT();
+                                        try {
+                                            openBT();
+                                        } catch (NoSuchMethodException e) {
+                                            e.printStackTrace();
+                                        } catch (InvocationTargetException e) {
+                                            e.printStackTrace();
+                                        } catch (IllegalAccessException e) {
+                                            e.printStackTrace();
+                                        }
                                     }
                                 });
                                 openConnection.start();
@@ -359,28 +376,36 @@ public class MainActivity extends ActionBarActivity
          * Initialized input and outputstream
          * Start threads
          */
-        private void openBT() {
-            UUID uuid = UUID.fromString("00001101-0000-1000-8000-00805F9B34FB");
+        private void openBT() throws NoSuchMethodException, InvocationTargetException, IllegalAccessException {
+//            UUID uuid = UUID.fromString("00001101-0000-1000-8000-00805F9B34FB");
+//            UUID uid = mDevice.getUuids()[0].getUuid();
+            Method m = mDevice.getClass().getMethod("createRfcommSocket", new Class[] {int.class});
             // Standard
             // SerialPortService
             // ID
-            rcMessageappend("UUID set standard serial port service\n");
+            rcMessageappend("UUID set standard serial port service(deprecated\nreplace by getUUIDs from mDevice )\n");
             try {
-                mBluetoothSocket = mDevice.createRfcommSocketToServiceRecord(uuid);
+                mBluetoothSocket = (BluetoothSocket) m.invoke(mDevice, 1);
                 rcMessageappend("Bluetooth socket initialized\nConnecting......\n");
                 mBluetoothSocket.connect();
                 rcMessageappend("Device connected\n");
                 mInputStream = mBluetoothSocket.getInputStream();
                 mOutputStream = mBluetoothSocket.getOutputStream();
-                rcMessageappend("InputStream initialized\nwaiting for input\n");
+                rcMessageappend("InputStream initialized\n");
 //                rcMessageappend("OutputStream initialized\nwaiting for Output\n");
-                ((MainActivity)getActivity()).storeInputStream(mInputStream);
-                ((MainActivity)getActivity()).storeBluetoothSocket(mBluetoothSocket);
             } catch (IOException e) {
                 rcMessageappend("Connect error:\nDevice not responding\n");
                 Log.w("exception", e.toString());
+                return;
             }
-
+            try {
+                ((MainActivity) getActivity()).storeInputStream(mInputStream);
+                rcMessageappend("mInputStream stored success,");
+                ((MainActivity) getActivity()).storeBluetoothSocket(mBluetoothSocket);
+                rcMessageappend("mBluetoothSocket stored success, ready to go\n");
+            }catch(IOError e){
+                rcMessageappend("Over class method corrupted");
+            }
         }
 
         private void rcMessageappend(final String str) {

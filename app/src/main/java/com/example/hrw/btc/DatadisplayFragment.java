@@ -81,7 +81,7 @@ public class DatadisplayFragment extends Fragment {
 
     /**
      * Listening for incoming data
-     * and calculate it's average.
+     * and calculate it's value.
      */
     private Runnable lisData = new Runnable() {
         @Override
@@ -97,17 +97,22 @@ public class DatadisplayFragment extends Fragment {
                         if(packet[0] == -91 && packet[1] == -91){//if it is the correct packet
 //                            seqID = packet[2];
 //                            payloadSize = packet[3];
-                            tvxd.setText(String.valueOf(get71Var(getBitstoString(packet[4]),getBits(packet[4]))));
-                            tvxd_av.setText(String.valueOf(get71Var(getBitstoString(packet[5]),getBits(packet[5]))));
-                            tvxd_sd.setText(String.valueOf(get71Var(getBitstoString(packet[6]),getBits(packet[6]))));
-                            tvzd.setText(String.valueOf(get71Var(getBitstoString(packet[7]),getBits(packet[7]))));
-                            tvzd_av.setText(String.valueOf(get71Var(getBitstoString(packet[8]), getBits(packet[8]))));
-                            tvzd_sd.setText(String.valueOf(get71Var(getBitstoString(packet[9]),getBits(packet[9]))));
-                            stepR.setText(String.valueOf(getIntValue(packet[10], packet[11])));
-                            stepL.setText(String.valueOf(getIntValue(packet[12], packet[13])));
-                            lr_ratio.setText(String.valueOf(getFloatValue(packet[14], packet[15])));
-                            lr_ratio_av.setText(String.valueOf(getFloatValue(packet[16],packet[17])));
-                            lr_ratio_sd.setText(String.valueOf(getFloatValue(packet[18],packet[19])));
+                            getActivity().runOnUiThread(new Runnable() {
+                                @Override
+                                public void run() {
+                                    tvxd.setText(String.valueOf(get71Var(getBitstoString(packet[4]),getBits(packet[4]))));
+                                    tvxd_av.setText(String.valueOf(get71Var(getBitstoString(packet[5]),getBits(packet[5]))));
+                                    tvxd_sd.setText(String.valueOf(get71Var(getBitstoString(packet[6]),getBits(packet[6]))));
+                                    tvzd.setText(String.valueOf(get71Var(getBitstoString(packet[7]),getBits(packet[7]))));
+                                    tvzd_av.setText(String.valueOf(get71Var(getBitstoString(packet[8]), getBits(packet[8]))));
+                                    tvzd_sd.setText(String.valueOf(get71Var(getBitstoString(packet[9]),getBits(packet[9]))));
+                                    stepR.setText(String.valueOf(getIntValue(packet[10], packet[11])));
+                                    stepL.setText(String.valueOf(getIntValue(packet[12], packet[13])));
+                                    lr_ratio.setText(String.valueOf(getFloatValue(packet[14], packet[15])));
+                                    lr_ratio_av.setText(String.valueOf(getFloatValue(packet[16],packet[17])));
+                                    lr_ratio_sd.setText(String.valueOf(getFloatValue(packet[18],packet[19])));
+                                }
+                            });
                         }
                     }
                 } catch (IOException e) {
@@ -176,7 +181,7 @@ public class DatadisplayFragment extends Fragment {
                 return  temp + (float) 0.5;
             }
         }else{
-            temp = Integer.parseInt(string.substring(1,7),2) - 128;
+            temp = Integer.parseInt(string.substring(1,7),2) - 2 * Integer.parseInt(string.substring(1,7),2);
             if (bytes[7] == 0){
                 return temp;
             }else{
@@ -211,6 +216,13 @@ public class DatadisplayFragment extends Fragment {
         }
     }
 
+    /**
+     *
+     * @param inputStream of BlueTooth socket
+     * @return Byte Array
+     * @throws IOException
+     * @throws ClassNotFoundException
+     */
     private Byte[] getByteArray(InputStream inputStream) throws IOException, ClassNotFoundException {
         return (Byte []) new ObjectInputStream(inputStream).readObject();
     }

@@ -13,7 +13,7 @@
         android:textColor="#FFFFFF"
         flatui:borderWidth="0dp"
         flatui:cornerRadius="0.5dp"
-        flatui:fontFamily="uc"
+        flatui:fontFamily="kg"
         flatui:fontWeight="regular"
         flatui:fontExtension="ttf"
         flatui:backgroundColor="main"
@@ -32,7 +32,7 @@
 
         <com.cengalabs.flatui.views.FlatTextView
             android:layout_marginRight="3dp"
-            flatui:fontFamily="uc"
+            flatui:fontFamily="kg"
             flatui:fontWeight="regular"
             flatui:fontExtension="ttf"
             android:textColor="#ff031a47"
@@ -98,7 +98,6 @@
             flatui:size="5dp"
             android:textColor="#FFFFFFFF"
             android:gravity="center"
-            android:text="2391"
             android:textSize="18sp"
             android:layout_weight="1"
             android:layout_width="match_parent"
@@ -137,7 +136,6 @@
             flatui:size="5dp"
             android:textColor="#FFFFFFFF"
             android:gravity="center"
-            android:text="2392"
             android:textSize="18sp"
             android:layout_weight="1"
             android:layout_width="match_parent"
@@ -188,7 +186,6 @@
             android:textColor="#FFFFFFFF"
             android:gravity="center"
             android:textSize="20sp"
-            android:text="33.19"
             android:layout_weight="1"
             android:layout_width="match_parent"
             android:layout_height="match_parent" />
@@ -206,7 +203,6 @@
             android:textColor="#FFFFFFFF"
             android:gravity="center"
             android:textSize="20sp"
-            android:text="1.2"
             android:layout_weight="1"
             android:layout_width="match_parent"
             android:layout_height="match_parent" />
@@ -223,7 +219,6 @@
             android:textColor="#FFFFFFFF"
             android:gravity="center"
             android:textSize="20sp"
-            android:text="-15.59"
             android:layout_weight="1"
             android:layout_width="match_parent"
             android:layout_height="match_parent" />
@@ -273,7 +268,6 @@
             android:textColor="#FFFFFFFF"
             android:gravity="center"
             android:textSize="20sp"
-            android:text="-15.59"
             android:layout_weight="1"
             android:layout_width="match_parent"
             android:layout_height="match_parent" />
@@ -291,7 +285,6 @@
             android:textColor="#FFFFFFFF"
             android:gravity="center"
             android:textSize="20sp"
-            android:text="-15.59"
             android:layout_weight="1"
             android:layout_width="match_parent"
             android:layout_height="match_parent" />
@@ -308,7 +301,6 @@
             android:textColor="#FFFFFFFF"
             android:gravity="center"
             android:textSize="20sp"
-            android:text="-15.59"
             android:layout_weight="1"
             android:layout_width="match_parent"
             android:layout_height="match_parent" />
@@ -358,7 +350,6 @@
             android:textColor="#FFFFFFFF"
             android:gravity="center"
             android:textSize="20sp"
-            android:text="79"
             android:layout_weight="1"
             android:layout_width="match_parent"
             android:layout_height="match_parent" />
@@ -376,7 +367,6 @@
             android:textColor="#FFFFFFFF"
             android:gravity="center"
             android:textSize="20sp"
-            android:text="211.3"
             android:layout_weight="1"
             android:layout_width="match_parent"
             android:layout_height="match_parent" />
@@ -393,7 +383,6 @@
             android:textColor="#FFFFFFFF"
             android:gravity="center"
             android:textSize="20sp"
-            android:text="11.38"
             android:layout_weight="1"
             android:layout_width="match_parent"
             android:layout_height="match_parent" />
