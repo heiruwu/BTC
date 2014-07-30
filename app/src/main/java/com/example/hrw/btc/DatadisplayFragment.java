@@ -129,16 +129,16 @@ public class DatadisplayFragment extends Fragment {
     }
 
     /**
-     * Transfer inputstream to int array.
+     * Get int array from inputstream.
      */
     private int[] getIntArray(InputStream inputStream) throws IOException, ClassNotFoundException {
         return (int[]) new ObjectInputStream(inputStream).readObject();
     }
 
     /**
-     * Transfer a byte to byte array containing all 8 bits.
-     * @param b
-     * @return Byte[]
+     * Convert a byte to byte array containing all 8 bits.
+     * @param b one byte
+     * @return Byte[] with 8 bits
      */
     private Byte[] getBits(byte b){
         Byte[] bits = new Byte[8];
@@ -151,9 +151,9 @@ public class DatadisplayFragment extends Fragment {
     }
 
     /**
-     * Transfer a byte to String containing all 8 bits.
-     * @param b
-     * @return String
+     * Convert a byte to String containing all 8 bits.
+     * @param b ont byte
+     * @return String with 8 bits
      */
     private String getBitstoString(byte b){
         return ""
@@ -164,10 +164,10 @@ public class DatadisplayFragment extends Fragment {
     }
 
     /**
-     * Get values of 7.1 formatted packet.
+     * Convert 7.1 format packet into float.
      * @param string a String containing 8 bit
      * @param bytes a Byte array containing 8 bit
-     * @return int
+     * @return float value of 7.1 packet
      */
     private float get71Var(String string, Byte[] bytes){
         float temp;
@@ -190,12 +190,25 @@ public class DatadisplayFragment extends Fragment {
         }
     }
 
+    /**
+     * Convert 16 bits int value from byte to int.
+     * @param L Low 8 bits
+     * @param H High 8 bits
+     * @return int value
+     */
+
     private int getIntValue(Byte L,Byte H){
         String temp = getBitstoString(H);
         temp += getBitstoString(L);
         return Integer.parseInt(temp,2);
     }
 
+    /**
+     * Convert 16 bits float value from byte to float.
+     * @param L Low 8 bits
+     * @param H High 8 bits
+     * @return float value
+     */
     private float getFloatValue(Byte L,Byte H){
         float tempint;
         String temp = getBitstoString(H);
@@ -217,8 +230,8 @@ public class DatadisplayFragment extends Fragment {
     }
 
     /**
-     *
-     * @param inputStream of BlueTooth socket
+     * Get byte array from inputstream.
+     * @param inputStream of bluetooth socket
      * @return Byte Array
      * @throws IOException
      * @throws ClassNotFoundException
