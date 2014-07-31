@@ -108,15 +108,18 @@ public class MainActivity extends ActionBarActivity
         switch(position) {
             case 0:
                 fragmentManager.beginTransaction()
-                    .replace(R.id.container, PlaceholderFragment.newInstance(position + 1))
-                    .commit();
+                        .replace(R.id.container, PlaceholderFragment.newInstance(position + 1))
+                        .commit();
                 break;
             case 1:
-                if(bluetoothSocket.isConnected()) {
-                    fragment = new DatadisplayFragment();
-                    fragmentManager.beginTransaction().replace(R.id.container, fragment).commit();
-                }else{
-                    Toast.makeText(this,"Please connect to the device first",Toast.LENGTH_LONG).show();
+                if (bluetoothSocket != null) {
+                    if (!bluetoothSocket.isConnected()) {
+                        Toast.makeText(this, "Please connect to the device first", Toast.LENGTH_LONG).show();
+                    } else {
+                        fragment = new DatadisplayFragment();
+                        fragmentManager.beginTransaction().replace(R.id.container, fragment).commit();
+                        mTitle = getString(R.string.title_section2);
+                    }
                 }
         }
     }
@@ -385,6 +388,7 @@ public class MainActivity extends ActionBarActivity
             // ID
             rcMessageappend("UUID set standard serial port service(deprecated\nreplace by getUUIDs from mDevice )\n");
             try {
+//                mBluetoothSocket = mDevice.createRfcommSocketToServiceRecord(uuid);
                 mBluetoothSocket = (BluetoothSocket) m.invoke(mDevice, 1);
                 rcMessageappend("Bluetooth socket initialized\nConnecting......\n");
                 mBluetoothSocket.connect();

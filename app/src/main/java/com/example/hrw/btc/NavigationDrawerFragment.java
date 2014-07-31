@@ -11,6 +11,7 @@ import android.content.SharedPreferences;
 import android.content.res.Configuration;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -20,6 +21,7 @@ import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
+import android.widget.TextView;
 import android.widget.Toast;
 
 /**
@@ -243,12 +245,37 @@ public class NavigationDrawerFragment extends Fragment {
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
+        Log.w("","1");
+        TextView stepR,stepL,tvxd,tvxd_av,tvxd_sd,tvzd,tvzd_av,tvzd_sd,lr_ratio,lr_ratio_av,lr_ratio_sd;
         if (mDrawerToggle.onOptionsItemSelected(item)) {
             return true;
         }
 
         if (item.getItemId() == R.id.action_refresh) {
-            //Clear all TextView
+            if(getActivity().findViewById(R.id.stepL) != null) {
+                stepR = (TextView) getActivity().findViewById(R.id.stepR);
+                stepL = (TextView) getActivity().findViewById(R.id.stepL);
+                tvxd = (TextView) getActivity().findViewById(R.id.xd);
+                tvxd_av = (TextView) getActivity().findViewById(R.id.xd_av);
+                tvxd_sd = (TextView) getActivity().findViewById(R.id.xd_sd);
+                tvzd = (TextView) getActivity().findViewById(R.id.zd);
+                tvzd_av = (TextView) getActivity().findViewById(R.id.zd_av);
+                tvzd_sd = (TextView) getActivity().findViewById(R.id.zd_sd);
+                lr_ratio = (TextView) getActivity().findViewById(R.id.lr_ratio);
+                lr_ratio_av = (TextView) getActivity().findViewById(R.id.lr_ratio_av);
+                lr_ratio_sd = (TextView) getActivity().findViewById(R.id.lr_ratio_sd);
+                stepR.setText("");
+                stepL.setText("");
+                tvxd.setText("");
+                tvxd_av.setText("");
+                tvxd_sd.setText("");
+                tvzd.setText("");
+                tvzd_av.setText("");
+                tvzd_sd.setText("");
+                lr_ratio.setText("");
+                lr_ratio_av.setText("");
+                lr_ratio_sd.setText("");
+            }
             return true;
         }
 

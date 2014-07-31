@@ -2,7 +2,7 @@
 <resources>
 
     <string name="app_name">BTC</string>
-    <string name="title_section1"></string>
+    <string name="title_section1">Connect page</string>
     <string name="title_section2">Data display page</string>
     <string name="title_section3">Section 3</string>
     <string name="navigation_drawer_open">Open navigation drawer</string>

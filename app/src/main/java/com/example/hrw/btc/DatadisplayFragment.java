@@ -14,6 +14,7 @@ import android.view.Window;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
+import android.widget.ToggleButton;
 
 import com.cengalabs.flatui.FlatUI;
 
@@ -43,10 +44,12 @@ limitations under the License.
 /**
  * Created by hrw on 2014/7/21.
  */
-public class DatadisplayFragment extends Fragment {
+public class DatadisplayFragment extends Fragment implements View.OnClickListener {
+    private Object pauseLock;
     private BluetoothSocket mBluetoothSocket;
     private InputStream mInputStream;
     private Thread listenData;
+    private ToggleButton toggle;
     private TextView stepR,stepL,tvxd,tvxd_av,tvxd_sd,tvzd,tvzd_av,tvzd_sd,lr_ratio,lr_ratio_av,lr_ratio_sd;
     private byte[] packet;
 
@@ -59,6 +62,8 @@ public class DatadisplayFragment extends Fragment {
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
+        pauseLock = new Object();
+        toggle = (ToggleButton)getView().findViewById(R.id.toggle);
         stepR = (TextView)getView().findViewById(R.id.stepR);
         stepL = (TextView)getView().findViewById(R.id.stepL);
         tvxd = (TextView)getView().findViewById(R.id.xd);
@@ -70,6 +75,7 @@ public class DatadisplayFragment extends Fragment {
         lr_ratio = (TextView)getView().findViewById(R.id.lr_ratio);
         lr_ratio_av = (TextView)getView().findViewById(R.id.lr_ratio_av);
         lr_ratio_sd = (TextView)getView().findViewById(R.id.lr_ratio_sd);
+        toggle.setOnClickListener(this);
         mBluetoothSocket = ((MainActivity)getActivity()).getBluetoothSocket();
         FlatUI.initDefaultValues(getActivity());
         FlatUI.setDefaultTheme(FlatUI.DEEP);
@@ -89,13 +95,13 @@ public class DatadisplayFragment extends Fragment {
         public void run() {
             while (mBluetoothSocket.isConnected()) {
                 try {
-                    if (mInputStream.available() == 23) {
+                    if (mInputStream.available() >= 23) {
                         packet = new byte[23];
                         int useless;
                         useless = mInputStream.read(packet);
                         Log.w("Data", "available");
                         Log.w("Header",String.valueOf(packet[0]));
-                        if(packet[0] == -91 && packet[1] == -91){//if it is the correct packetf
+                        if(packet[0] == -91 && packet[1] == -91){//if it is the correct packet
 //                            seqID = packet[2];
 //                            payloadSize = packet[3];
                             getActivity().runOnUiThread(new Runnable() {
@@ -251,4 +257,20 @@ public class DatadisplayFragment extends Fragment {
         return b;
     }
 
+    @Override
+    public void onClick(View view) {
+        if(toggle.isChecked()){
+            synchronized (pauseLock){
+                try {
+                    pauseLock.wait();
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            }
+        }else{
+            synchronized (pauseLock){
+                pauseLock.notifyAll();
+            }
+        }
+    }
 }
