@@ -57,6 +57,7 @@ public class DatadisplayFragment extends Fragment implements View.OnClickListene
         super.onActivityCreated(savedInstanceState);
         pauseLock = new Object();
         toggle = (ToggleButton)getView().findViewById(R.id.toggle);
+        toggle.setChecked(true);
         stepR = (TextView)getView().findViewById(R.id.stepR);
         stepL = (TextView)getView().findViewById(R.id.stepL);
         tvxd = (TextView)getView().findViewById(R.id.xd);
@@ -261,7 +262,7 @@ public class DatadisplayFragment extends Fragment implements View.OnClickListene
                 }
             }
         }else{
-            synchronized (pauseLock){
+            synchronized (pauseLock) {
                 pauseLock.notifyAll();
             }
         }

@@ -1,16 +1,13 @@
 package com.example.hrw.btc;
 
-import android.annotation.TargetApi;
 import android.app.Activity;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothSocket;
 import android.content.Intent;
-import android.os.Build;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
-import android.support.v4.app.FragmentTransaction;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarActivity;
@@ -21,7 +18,6 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.Window;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
@@ -30,7 +26,6 @@ import android.widget.Toast;
 
 import com.cengalabs.flatui.FlatUI;
 import com.dacer.androidcharts.BarView;
-import com.dacer.androidcharts.LineView;
 
 import java.io.IOError;
 import java.io.IOException;
@@ -41,8 +36,6 @@ import java.io.OutputStream;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
-import java.util.BitSet;
-import java.util.Scanner;
 import java.util.Set;
 import java.util.UUID;
 
@@ -87,8 +80,8 @@ public class MainActivity extends ActionBarActivity
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        getActionBar().setBackgroundDrawable(FlatUI.getActionBarDrawable(this,FlatUI.DARK, false));
-        getSupportActionBar().setBackgroundDrawable(FlatUI.getActionBarDrawable(this,FlatUI.DARK, false));
+        getActionBar().setBackgroundDrawable(FlatUI.getActionBarDrawable(this, FlatUI.DARK, false));
+        getSupportActionBar().setBackgroundDrawable(FlatUI.getActionBarDrawable(this, FlatUI.DARK, false));
         Fdata = new ArrayList<Integer>();
         mNavigationDrawerFragment = (NavigationDrawerFragment)
                 getSupportFragmentManager().findFragmentById(R.id.navigation_drawer);
@@ -105,7 +98,7 @@ public class MainActivity extends ActionBarActivity
         // update the main content by replacing fragments
         Fragment fragment = null;
         FragmentManager fragmentManager = getSupportFragmentManager();
-        switch(position) {
+        switch (position) {
             case 0:
                 fragmentManager.beginTransaction()
                         .replace(R.id.container, PlaceholderFragment.newInstance(position + 1))
@@ -146,16 +139,19 @@ public class MainActivity extends ActionBarActivity
         actionBar.setTitle(mTitle);
     }
 
-    public BluetoothSocket getBluetoothSocket(){
+    public BluetoothSocket getBluetoothSocket() {
         return this.bluetoothSocket;
     }
-    public void storeBluetoothSocket(BluetoothSocket bluetoothSocket){
+
+    public void storeBluetoothSocket(BluetoothSocket bluetoothSocket) {
         this.bluetoothSocket = bluetoothSocket;
     }
-    public void storeInputStream(InputStream inputStream){
+
+    public void storeInputStream(InputStream inputStream) {
         this.inputStream = inputStream;
     }
-    public InputStream getInputStream(){
+
+    public InputStream getInputStream() {
         return this.inputStream;
     }
 
@@ -290,7 +286,7 @@ public class MainActivity extends ActionBarActivity
                     findBT();
                     break;
                 case 2:
-                    TextView avgText = (TextView)getActivity().findViewById(R.id.avgText);
+                    TextView avgText = (TextView) getActivity().findViewById(R.id.avgText);
                     ArrayList<String> bottom = new ArrayList<String>();
                     bottom.add("1~20");
                     bottom.add("21~40");
@@ -301,16 +297,16 @@ public class MainActivity extends ActionBarActivity
                     barView.setBottomTextList(bottom);
                     ArrayList<Integer> avgData = new ArrayList<Integer>();
                     int loop = 0;
-                    for(int i = 0;i<5;i++){
+                    for (int i = 0; i < 5; i++) {
                         int temp1 = 0;
-                        for(int j = 0;j<20;j++){
-                            temp1 += ((MainActivity)getActivity()).getData().get(loop);
+                        for (int j = 0; j < 20; j++) {
+                            temp1 += ((MainActivity) getActivity()).getData().get(loop);
                             loop++;
                         }
-                        avgData.add(temp1/20);
-                        avgText.append("   "+String.valueOf(temp1/20)+"        ");
+                        avgData.add(temp1 / 20);
+                        avgText.append("   " + String.valueOf(temp1 / 20) + "        ");
                     }
-                    barView.setDataList(avgData,100);
+                    barView.setDataList(avgData, 100);
                     break;
             }
         }
@@ -377,16 +373,16 @@ public class MainActivity extends ActionBarActivity
          * Start threads
          */
         private void openBT() throws NoSuchMethodException, InvocationTargetException, IllegalAccessException {
-//            UUID uuid = UUID.fromString("00001101-0000-1000-8000-00805F9B34FB");
+            UUID uuid = UUID.fromString("00001101-0000-1000-8000-00805F9B34FB");
 //            UUID uid = mDevice.getUuids()[0].getUuid();
-            Method m = mDevice.getClass().getMethod("createRfcommSocket", new Class[] {int.class});
+            Method m = mDevice.getClass().getMethod("createRfcommSocket", new Class[]{int.class});
             // Standard
             // SerialPortService
             // ID
             rcMessageappend("UUID set standard serial port service(deprecated\nreplace by getUUIDs from mDevice )\n");
             try {
-//                mBluetoothSocket = mDevice.createRfcommSocketToServiceRecord(uuid);
-                mBluetoothSocket = (BluetoothSocket) m.invoke(mDevice, 1);
+                mBluetoothSocket = mDevice.createRfcommSocketToServiceRecord(uuid);
+//                mBluetoothSocket = (BluetoothSocket) m.invoke(mDevice, 1);
                 rcMessageappend("Bluetooth socket initialized\nConnecting......\n");
                 mBluetoothSocket.connect();
                 rcMessageappend("Device connected\n");
@@ -404,7 +400,7 @@ public class MainActivity extends ActionBarActivity
                 rcMessageappend("mInputStream stored success,");
                 ((MainActivity) getActivity()).storeBluetoothSocket(mBluetoothSocket);
                 rcMessageappend("mBluetoothSocket stored success, ready to go\n");
-            }catch(IOError e){
+            } catch (IOError e) {
                 rcMessageappend("Over class method corrupted");
             }
         }
@@ -420,7 +416,7 @@ public class MainActivity extends ActionBarActivity
         }
 
         /**
-         *Get byte array data from input stream.
+         * Get byte array data from input stream.
          */
         private void getData() throws IOException, ClassNotFoundException {
             data = getIntArray(mInputStream);
