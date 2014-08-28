@@ -13,20 +13,20 @@ repositories {
 }
 
 android {
-    compileSdkVersion 19
-    buildToolsVersion "19.1.0"
-
+    compileSdkVersion 20
+    buildToolsVersion '20.0.0'
     defaultConfig {
-        minSdkVersion 14
+        minSdkVersion 20
         targetSdkVersion 20
     }
-
     buildTypes {
         release {
             runProguard false
             proguardFile 'proguard-rules.txt'
             proguardFile getDefaultProguardFile('proguard-android-optimize.txt')
         }
+    }
+    productFlavors {
     }
 }
 
