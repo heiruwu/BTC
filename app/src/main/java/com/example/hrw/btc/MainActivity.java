@@ -113,6 +113,8 @@ public class MainActivity extends ActionBarActivity
                         fragmentManager.beginTransaction().replace(R.id.container, fragment).commit();
                         mTitle = getString(R.string.title_section2);
                     }
+                } else {
+                    Toast.makeText(this, "Please connect to the device first", Toast.LENGTH_LONG).show();
                 }
         }
     }
