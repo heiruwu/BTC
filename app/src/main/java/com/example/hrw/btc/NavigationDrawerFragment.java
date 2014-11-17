@@ -252,30 +252,30 @@ public class NavigationDrawerFragment extends Fragment {
         }
 
         if (item.getItemId() == R.id.action_refresh) {
-            if(getActivity().findViewById(R.id.stepL) != null) {
-                stepR = (TextView) getActivity().findViewById(R.id.stepR);
-                stepL = (TextView) getActivity().findViewById(R.id.stepL);
-                tvxd = (TextView) getActivity().findViewById(R.id.xd);
-                tvxd_av = (TextView) getActivity().findViewById(R.id.xd_av);
-                tvxd_sd = (TextView) getActivity().findViewById(R.id.xd_sd);
-                tvzd = (TextView) getActivity().findViewById(R.id.zd);
-                tvzd_av = (TextView) getActivity().findViewById(R.id.zd_av);
-                tvzd_sd = (TextView) getActivity().findViewById(R.id.zd_sd);
-                lr_ratio = (TextView) getActivity().findViewById(R.id.lr_ratio);
-                lr_ratio_av = (TextView) getActivity().findViewById(R.id.lr_ratio_av);
-                lr_ratio_sd = (TextView) getActivity().findViewById(R.id.lr_ratio_sd);
-                stepR.setText("");
-                stepL.setText("");
-                tvxd.setText("");
-                tvxd_av.setText("");
-                tvxd_sd.setText("");
-                tvzd.setText("");
-                tvzd_av.setText("");
-                tvzd_sd.setText("");
-                lr_ratio.setText("");
-                lr_ratio_av.setText("");
-                lr_ratio_sd.setText("");
-            }
+//            if(getActivity().findViewById(R.id.stepL) != null) {
+//                stepR = (TextView) getActivity().findViewById(R.id.stepR);
+//                stepL = (TextView) getActivity().findViewById(R.id.stepL);
+//                tvxd = (TextView) getActivity().findViewById(R.id.xd);
+//                tvxd_av = (TextView) getActivity().findViewById(R.id.xd_av);
+//                tvxd_sd = (TextView) getActivity().findViewById(R.id.xd_sd);
+//                tvzd = (TextView) getActivity().findViewById(R.id.zd);
+//                tvzd_av = (TextView) getActivity().findViewById(R.id.zd_av);
+//                tvzd_sd = (TextView) getActivity().findViewById(R.id.zd_sd);
+//                lr_ratio = (TextView) getActivity().findViewById(R.id.lr_ratio);
+//                lr_ratio_av = (TextView) getActivity().findViewById(R.id.lr_ratio_av);
+//                lr_ratio_sd = (TextView) getActivity().findViewById(R.id.lr_ratio_sd);
+//                stepR.setText("");
+//                stepL.setText("");
+//                tvxd.setText("");
+//                tvxd_av.setText("");
+//                tvxd_sd.setText("");
+//                tvzd.setText("");
+//                tvzd_av.setText("");
+//                tvzd_sd.setText("");
+//                lr_ratio.setText("");
+//                lr_ratio_av.setText("");
+//                lr_ratio_sd.setText("");
+//            }
             return true;
         }
 
