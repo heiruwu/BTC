@@ -3,7 +3,7 @@ buildscript {
         mavenCentral()
     }
     dependencies {
-        classpath 'com.android.tools.build:gradle:0.12.+'
+        classpath 'com.android.tools.build:gradle:1.0.0-rc2'
     }
 }
 apply plugin: 'android-library'
@@ -23,7 +23,7 @@ android {
 
     buildTypes {
         release {
-            runProguard false
+            minifyEnabled false
             proguardFile 'proguard-rules.txt'
             proguardFile getDefaultProguardFile('proguard-android-optimize.txt')
         }
