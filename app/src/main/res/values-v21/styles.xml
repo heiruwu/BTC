@@ -4,4 +4,5 @@
         <item name="android:statusBarColor">@color/sea_darker</item>
         <item name="android:actionBarItemBackground">@color/sea_dark</item>
     </style>
+
 </resources>

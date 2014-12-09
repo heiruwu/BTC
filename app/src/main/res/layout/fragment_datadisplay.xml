@@ -186,7 +186,6 @@
             flatui:size="5dp"
             android:textColor="#FFFFFFFF"
             android:gravity="center"
-            android:text="12312"
             android:textSize="20sp"
             android:layout_weight="1"
             android:layout_width="match_parent"

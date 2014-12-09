@@ -87,7 +87,13 @@ public class DatadisplayFragment extends Fragment implements View.OnClickListene
     private Runnable lisData = new Runnable() {
         @Override
         public void run() {
+                Log.w("Runnable","start, Socket" + mBluetoothSocket.isConnected());
             while (mBluetoothSocket.isConnected()) {
+//                try {
+//                    Log.w("data","available :"+mInputStream.available());
+//                } catch (IOException e) {
+//                    e.printStackTrace();
+//                }
                 try {
                     if (mInputStream.available() >= 23) {
                         packet = new byte[23];
@@ -253,18 +259,18 @@ public class DatadisplayFragment extends Fragment implements View.OnClickListene
 
     @Override
     public void onClick(View view) {
-        if(toggle.isChecked()){
-            synchronized (pauseLock){
-                try {
-                    pauseLock.wait();
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
-            }
-        }else{
-            synchronized (pauseLock) {
-                pauseLock.notifyAll();
-            }
-        }
+//        if(toggle.isChecked()){
+//            synchronized (pauseLock){
+//                try {
+//                    pauseLock.wait();
+//                } catch (InterruptedException e) {
+//                    e.printStackTrace();
+//                }
+//            }
+//        }else{
+//            synchronized (pauseLock) {
+//                pauseLock.notifyAll();
+//            }
+//        }
     }
 }
