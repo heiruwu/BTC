@@ -107,12 +107,12 @@ public class DatadisplayFragment extends Fragment implements View.OnClickListene
                             getActivity().runOnUiThread(new Runnable() {
                                 @Override
                                 public void run() {
-                                    tvxd.setText(String.valueOf(get71Var(getBitstoString(packet[4]),getBits(packet[4]))));
-                                    tvxd_av.setText(String.valueOf(get71Var(getBitstoString(packet[5]),getBits(packet[5]))));
-                                    tvxd_sd.setText(String.valueOf(get71Var(getBitstoString(packet[6]),getBits(packet[6]))));
-                                    tvzd.setText(String.valueOf(get71Var(getBitstoString(packet[7]),getBits(packet[7]))));
-                                    tvzd_av.setText(String.valueOf(get71Var(getBitstoString(packet[8]), getBits(packet[8]))));
-                                    tvzd_sd.setText(String.valueOf(get71Var(getBitstoString(packet[9]),getBits(packet[9]))));
+                                    tvxd.setText(String.valueOf(get71Var(getBitsToString(packet[4]),getBits(packet[4]))));
+                                    tvxd_av.setText(String.valueOf(get71Var(getBitsToString(packet[5]),getBits(packet[5]))));
+                                    tvxd_sd.setText(String.valueOf(get71Var(getBitsToString(packet[6]),getBits(packet[6]))));
+                                    tvzd.setText(String.valueOf(get71Var(getBitsToString(packet[7]),getBits(packet[7]))));
+                                    tvzd_av.setText(String.valueOf(get71Var(getBitsToString(packet[8]), getBits(packet[8]))));
+                                    tvzd_sd.setText(String.valueOf(get71Var(getBitsToString(packet[9]),getBits(packet[9]))));
                                     stepR.setText(String.valueOf(getIntValue(packet[10], packet[11])));
                                     stepL.setText(String.valueOf(getIntValue(packet[12], packet[13])));
                                     lr_ratio.setText(String.valueOf(getFloatValue(packet[14], packet[15])));
@@ -167,7 +167,7 @@ public class DatadisplayFragment extends Fragment implements View.OnClickListene
      * @param b ont byte
      * @return String with 8 bits
      */
-    private String getBitstoString(byte b){
+    private String getBitsToString(byte b){
         return ""
                 + (byte) ((b >> 7) & 0x1) + (byte) ((b >> 6) & 0x1)
                 + (byte) ((b >> 5) & 0x1) + (byte) ((b >> 4) & 0x1)
@@ -210,8 +210,8 @@ public class DatadisplayFragment extends Fragment implements View.OnClickListene
      */
 
     private int getIntValue(Byte L,Byte H){
-        String temp = getBitstoString(H);
-        temp += getBitstoString(L);
+        String temp = getBitsToString(H);
+        temp += getBitsToString(L);
         return Integer.parseInt(temp,2);
     }
 
@@ -223,8 +223,8 @@ public class DatadisplayFragment extends Fragment implements View.OnClickListene
      */
     private float getFloatValue(Byte L,Byte H){
         float tempint;
-        String temp = getBitstoString(H);
-        temp += getBitstoString(L);
+        String temp = getBitsToString(H);
+        temp += getBitsToString(L);
         tempint = Integer.parseInt(temp.substring(0,14) , 2);
         if(Integer.valueOf(temp.substring(14,15)) == 0){
             if(Integer.valueOf(temp.substring(15,16)) == 0){
